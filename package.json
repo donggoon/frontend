@@ -1,7 +1,7 @@
 {
-  "name": "mobile",
+  "name": "frontend",
   "version": "1.0.0",
-  "description": "ums-mobile",
+  "description": "frontend",
   "author": "donggunkim",
   "private": true,
   "scripts": {

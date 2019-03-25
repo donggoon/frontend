@@ -72,9 +72,9 @@ export default {
     outline: none;
     cursor: pointer; }
   .header #butRefresh {
-    background: url(../assets/ic_refresh_white_24px.svg) center center no-repeat; }
+    background: url(/static/images/ic_refresh_white_24px.svg) center center no-repeat; }
   .header #butAdd {
-    background: url(../assets/ic_add_white_24px.svg) center center no-repeat; }
+    background: url(/static/images/ic_add_white_24px.svg) center center no-repeat; }
 
 .header__title {
   font-weight: 400;

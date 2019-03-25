@@ -15,12 +15,6 @@ export default {
     return {
       lists: []
     }
-  },
-  created () {
-    this.$http.get('/api/corp/m/M_WORK_WORK_INFO_LIST_07.do').then(resp => {
-      this.lists = resp.data.response
-      console.log(resp)
-    })
   }
 }
 </script>
