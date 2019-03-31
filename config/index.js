@@ -58,9 +58,9 @@ module.exports = {
     ),
 
     // Paths
-    assetsRoot: path.resolve(__dirname, '../../STW_CORP/webapp/jsp/static'),
+    assetsRoot: path.resolve(__dirname, '../../STW_CORP/webapp/static'),
     assetsSubDirectory: '',
-    assetsPublicPath: '/static',
+    assetsPublicPath: '../../static',
 
     /**
      * Source Maps

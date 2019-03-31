@@ -1,8 +1,12 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import HelloWorld from '@/components/HelloWorld'
 import Main from '@/components/Main'
 import Header from '@/components/Header'
 import Worklist from '@/components/Worklist'
+import Work from '@/components/Work'
+import DirectCost from '@/components/DirectCost'
+import Cost from '@/components/Cost'
 
 Vue.use(Router)
 
@@ -10,6 +14,11 @@ export default new Router({
   routes: [
     {
       path: '/',
+      name: 'HelloWorld',
+      component: HelloWorld
+    },
+    {
+      path: '/main',
       name: 'Main',
       component: Main,
       children: [
@@ -22,6 +31,21 @@ export default new Router({
           component: Worklist
         }
       ]
+    },
+    {
+      path: '/work',
+      name: 'Work',
+      component: Work
+    },
+    {
+      path: '/directcost',
+      name: 'DirectCost',
+      component: DirectCost
+    },
+    {
+      path: '/cost',
+      name: 'Cost',
+      component: Cost
     }
   ]
 })
