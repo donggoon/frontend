@@ -6,7 +6,7 @@ import Header from '@/components/Header'
 import Worklist from '@/components/Worklist'
 import Work from '@/components/Work'
 import DirectCost from '@/components/DirectCost'
-import Cost from '@/components/Cost'
+import DirectCostDetail from '@/components/DirectCostDetail'
 
 Vue.use(Router)
 
@@ -43,9 +43,9 @@ export default new Router({
       component: DirectCost
     },
     {
-      path: '/cost',
-      name: 'Cost',
-      component: Cost
+      path: '/directcostDetail',
+      name: 'DirectCostDetail',
+      component: DirectCostDetail
     }
   ]
 })

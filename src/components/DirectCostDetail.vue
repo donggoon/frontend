@@ -10,36 +10,36 @@
       required
     ></v-checkbox>
     <v-select
-      v-model="select"
+      v-model="matType"
       v-validate="'required'"
-      :items="types"
+      :items="matTypes"
       item-value="code_CD"
       item-text="code_DESC1"
-      :error-messages="errors.collect('select')"
+      :error-messages="errors.collect('matType')"
       label="작업유형"
-      data-vv-name="select"
+      data-vv-name="matType"
       required
-      v-on:change="changeType(`${select}`)"
+      v-on:change="changeType(`${matType}`)"
     ></v-select>
     <v-autocomplete
-      v-model="model"
+      v-model="matInfo"
       v-validate="'required'"
       :hint="!isEditing ? 'Click the icon to edit' : 'Click the icon to save'"
-      :items="infos"
+      :items="matInfos"
       item-value="mat_NO"
       item-text="mat_NM"
       :readonly="!isEditing"
       :label="`자재명 — ${isEditing ? 'Editable' : 'Readonly'}`"
-      data-vv-name="model"
+      data-vv-name="matInfo"
       persistent-hint
       return-object
-      v-on:change="changeQty()"
+      v-on:change="changeMatInfo()"
     >
     </v-autocomplete>
     <v-select
-      v-model="model"
+      v-model="matInfo"
       v-validate="'required'"
-      :items="infos"
+      :items="matInfos"
       item-value="spec_DESC"
       item-text="spec_DESC"
       :error-messages="errors.collect('spec')"
@@ -50,9 +50,9 @@
       append-icon
     ></v-select>
     <v-select
-      v-model="model"
+      v-model="matInfo"
       v-validate="'required'"
-      :items="infos"
+      :items="matInfos"
       item-value="unit_DESC"
       item-text="unit_DESC"
       :error-messages="errors.collect('unit')"
@@ -72,9 +72,9 @@
       v-on:change="changeQty()"
     ></v-text-field>
     <v-select
-      v-model="model"
+      v-model="matInfo"
       v-validate="'required'"
-      :items="infos"
+      :items="matInfos"
       item-value="mcst_CPUT_PRCE"
       item-text="mcst_CPUT_PRCE"
       :error-messages="errors.collect('mcst')"
@@ -85,18 +85,18 @@
       append-icon
     ></v-select>
     <v-text-field
-      v-model="mcst_tot"
+      v-model="mcstTotal"
       v-validate="'required'"
-      :error-messages="errors.collect('mcst_tot')"
+      :error-messages="errors.collect('mcstTotal')"
       label="자재비 금액"
-      data-vv-name="mcst_tot"
+      data-vv-name="mcstTotal"
       required
       readonly
     ></v-text-field>
     <v-select
-      v-model="model"
+      v-model="matInfo"
       v-validate="'required'"
-      :items="infos"
+      :items="matInfos"
       item-value="pexp_CPUT_PRCE"
       item-text="pexp_CPUT_PRCE"
       :error-messages="errors.collect('pexp')"
@@ -107,11 +107,11 @@
       append-icon
     ></v-select>
     <v-text-field
-      v-model="pexp_tot"
+      v-model="pexpTotal"
       v-validate="'required'"
-      :error-messages="errors.collect('pexp_tot')"
+      :error-messages="errors.collect('pexpTotal')"
       label="인건비 금액"
-      data-vv-name="pexp_tot"
+      data-vv-name="pexpTotal"
       required
       readonly
     ></v-text-field>
@@ -125,37 +125,43 @@
       readonly
     ></v-text-field>
     <v-select
-      v-model="demolCode"
+      v-model="demolType"
       v-validate="'required'"
-      :items="demolCosts"
+      :items="demolTypes"
       item-value="code_CD"
       item-text="code_NM"
-      :error-messages="errors.collect('demolCode')"
+      :error-messages="errors.collect('demolType')"
       label="철거비적용"
-      data-vv-name="demolCode"
+      data-vv-name="demolType"
       required
+      return-object
+      v-on:change="changeDemolType()"
     ></v-select>
     <v-select
-      v-model="timeCode"
+      v-model="timeType"
       v-validate="'required'"
-      :items="timeCosts"
+      :items="timeTypes"
       item-value="code_CD"
       item-text="code_NM"
-      :error-messages="errors.collect('timeCode')"
+      :error-messages="errors.collect('timeType')"
       label="시간할증"
-      data-vv-name="timeCode"
+      data-vv-name="timeType"
       required
+      return-object
+      v-on:change="changeTimeType()"
     ></v-select>
     <v-select
-      v-model="spaceCode"
+      v-model="spaceType"
       v-validate="'required'"
-      :items="spaceCosts"
+      :items="spaceTypes"
       item-value="code_CD"
       item-text="code_NM"
-      :error-messages="errors.collect('spaceCode')"
+      :error-messages="errors.collect('spaceType')"
       label="공간할증"
-      data-vv-name="spaceCode"
+      data-vv-name="spaceType"
       required
+      return-object
+      v-on:change="changeSpaceType()"
     ></v-select>
     <v-textarea
       v-model="description"
@@ -181,15 +187,18 @@ export default {
     validator: 'new'
   },
   data: () => ({
+    isFirst: true,
+    mcstInit: '',
+    pexpInit: '',
     qty: '',
-    pexp_tot: '',
-    mcst_tot: '',
+    pexpTotal: '',
+    mcstTotal: '',
     total: '',
     name: '',
     email: '',
-    select: null,
     materials: [],
-    types: [],
+    matType: null,
+    matTypes: [],
     checkbox: null,
     dictionary: {
       attributes: {
@@ -208,37 +217,37 @@ export default {
       }
     },
     isEditing: true,
-    model: null,
-    infos: [],
-    demolCode: null,
-    timeCode: null,
-    spaceCode: null,
-    demolCosts: [],
-    timeCosts: [],
-    spaceCosts: [],
+    matInfo: null,
+    matInfos: [],
+    demolType: null,
+    timeType: null,
+    spaceType: null,
+    demolTypes: [],
+    timeTypes: [],
+    spaceTypes: [],
     description: ''
   }),
   created () {
     this.$http.get('/m/getWorkType.do').then(resp => {
-      this.types = resp.data.response
+      this.matTypes = resp.data.response
       console.log(resp)
     })
     this.$http.get('/m/getCtrlInfo.do', {
       params: { CLS_ID: 'BSP826' }
     }).then(resp => {
-      this.demolCosts = resp.data.response
+      this.demolTypes = resp.data.response
       console.log(resp)
     })
     this.$http.get('/m/getCtrlInfo.do', {
       params: { CLS_ID: 'BSP827' }
     }).then(resp => {
-      this.timeCosts = resp.data.response
+      this.timeTypes = resp.data.response
       console.log(resp)
     })
     this.$http.get('/m/getCtrlInfo.do', {
       params: { CLS_ID: 'BSP828' }
     }).then(resp => {
-      this.spaceCosts = resp.data.response
+      this.spaceTypes = resp.data.response
       console.log(resp)
     })
   },
@@ -261,19 +270,44 @@ export default {
       this.$http.get('/m/getMatInfo.do', {
         params: { WRK_TYPE_CD: type }
       }).then(resp => {
-        this.infos = resp.data.response
+        this.matInfos = resp.data.response
         console.log(resp)
-        console.log(this.infos)
+        console.log(this.matInfos)
       })
     },
-    setInfo (model) {
-      console.log(model)
+    changeMatInfo () {
+      this.mcstInit = this.matInfo.mcst_CPUT_PRCE
+      this.pexpInit = this.matInfo.pexp_CPUT_PRCE
+      this.changeQty()
     },
     changeQty () {
       if (this.qty <= 0) return
-      this.pexp_tot = this.model.pexp_CPUT_PRCE * this.qty
-      this.mcst_tot = this.model.mcst_CPUT_PRCE * this.qty
-      this.total = this.pexp_tot + this.mcst_tot
+      this.pexpTotal = this.matInfo.pexp_CPUT_PRCE * this.qty
+      this.mcstTotal = this.matInfo.mcst_CPUT_PRCE * this.qty
+      this.total = this.pexpTotal + this.mcstTotal
+    },
+    changeDemolType () {
+      console.log(this.demolType)
+      console.log(this.demolType.code_CTRL01)
+      this.matInfo.pexp_CPUT_PRCE = this.pexpInit * this.demolType.code_CTRL01
+      this.matInfo.mcst_CPUT_PRCE = this.mcstInit * this.demolType.code_CTRL01
+      this.pexpTotal = this.matInfo.pexp_CPUT_PRCE * this.qty
+      this.mcstTotal = this.matInfo.mcst_CPUT_PRCE * this.qty
+      this.total = this.pexpTotal + this.mcstTotal
+    },
+    changeTimeType () {
+      console.log(this.timeType)
+      console.log(this.timeType.code_CTRL01)
+      this.matInfo.pexp_CPUT_PRCE = this.pexpInit * this.timeType.code_CTRL01
+      this.pexpTotal = this.matInfo.pexp_CPUT_PRCE * this.qty
+      this.total = this.pexpTotal + this.mcstTotal
+    },
+    changeSpaceType () {
+      console.log(this.spaceType)
+      console.log(this.spaceType.code_CTRL01)
+      this.matInfo.mcst_CPUT_PRCE = this.mcstInit * this.spaceType.code_CTRL01
+      this.mcstTotal = this.matInfo.mcst_CPUT_PRCE * this.qty
+      this.total = this.pexpTotal + this.mcstTotal
     }
   }
 }
