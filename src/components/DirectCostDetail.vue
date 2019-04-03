@@ -1,13 +1,12 @@
 <template>
   <form>
     <v-checkbox
-      v-model="checkbox"
-      :error-messages="errors.collect('checkbox')"
+      v-model="subContract"
+      :error-messages="errors.collect('subContract')"
       value="1"
       label="사급유무"
-      data-vv-name="checkbox"
-      type="checkbox"
-      required
+      data-vv-name="subContract"
+      type="subContract"
     ></v-checkbox>
     <v-select
       v-model="matType"
@@ -116,12 +115,26 @@
       readonly
     ></v-text-field>
     <v-text-field
+      v-model="timeCost"
+      :error-messages="errors.collect('timeCost')"
+      label="시간할증금"
+      data-vv-name="timeCost"
+      readonly
+    ></v-text-field>
+    <v-text-field
       v-model="total"
       v-validate="'required'"
       :error-messages="errors.collect('total')"
       label="합계"
       data-vv-name="total"
       required
+      readonly
+    ></v-text-field>
+    <v-text-field
+      v-model="spaceCost"
+      :error-messages="errors.collect('spaceCost')"
+      label="공간할증금"
+      data-vv-name="spaceCost"
       readonly
     ></v-text-field>
     <v-select
@@ -187,19 +200,21 @@ export default {
     validator: 'new'
   },
   data: () => ({
-    isFirst: true,
+    directCostDetails: [],
     mcstInit: '',
     pexpInit: '',
     qty: '',
     pexpTotal: '',
     mcstTotal: '',
+    timeCost: '',
+    spaceCost: '',
     total: '',
     name: '',
     email: '',
     materials: [],
     matType: null,
     matTypes: [],
-    checkbox: null,
+    subContract: null,
     dictionary: {
       attributes: {
         email: 'E-mail Address'
@@ -217,7 +232,7 @@ export default {
       }
     },
     isEditing: true,
-    matInfo: null,
+    matInfo: [],
     matInfos: [],
     demolType: null,
     timeType: null,
@@ -250,6 +265,16 @@ export default {
       this.spaceTypes = resp.data.response
       console.log(resp)
     })
+    this.$http.get('/m/getDirectCostDetail.do').then(resp => {
+      this.directCostDetails = resp.data.response
+      console.log(resp)
+      console.log(this.directCostDetails)
+      console.log(this.directCostDetails[0].wrk_TYPE_CD)
+      if (this.directCostDetails === null) return
+      this.subContract = this.directCostDetails[0].carr_USE_CD
+      this.matType = this.directCostDetails[0].wrk_TYPE_CD
+      this.changeType(this.matType)
+    })
   },
   mounted () {
     this.$validator.localize('en', this.dictionary)
@@ -262,7 +287,7 @@ export default {
       this.name = ''
       this.email = ''
       this.select = null
-      this.checkbox = null
+      this.subContract = null
       this.$validator.reset()
     },
     changeType (type) {
@@ -273,20 +298,31 @@ export default {
         this.matInfos = resp.data.response
         console.log(resp)
         console.log(this.matInfos)
+        this.matInfo.mat_NO = this.directCostDetails[0].mat_NO
+        this.matInfo.mat_NM = this.directCostDetails[0].mat_NM
+        this.matInfo.spec_DESC = this.directCostDetails[0].spec_DESC
+        this.matInfo.unit_DESC = this.directCostDetails[0].unit_DESC
+        this.qty = this.directCostDetails[0].mat_QTY
+        this.matInfo.mcst_CPUT_PRCE = this.directCostDetails[0].mcst_PRCE
+        this.matInfo.pexp_CPUT_PRCE = this.directCostDetails[0].pexp_PRCE
+        this.demolType = this.directCostDetails[0].dmol_COST_CD
       })
     },
     changeMatInfo () {
       this.mcstInit = this.matInfo.mcst_CPUT_PRCE
       this.pexpInit = this.matInfo.pexp_CPUT_PRCE
       this.changeQty()
+      this.changeDemolType()
+      this.changeTimeType()
+      this.changeSpaceType()
     },
     changeQty () {
-      if (this.qty <= 0) return
       this.pexpTotal = this.matInfo.pexp_CPUT_PRCE * this.qty
       this.mcstTotal = this.matInfo.mcst_CPUT_PRCE * this.qty
       this.total = this.pexpTotal + this.mcstTotal
     },
     changeDemolType () {
+      if (this.demolType === null) return
       console.log(this.demolType)
       console.log(this.demolType.code_CTRL01)
       this.matInfo.pexp_CPUT_PRCE = this.pexpInit * this.demolType.code_CTRL01
@@ -296,18 +332,18 @@ export default {
       this.total = this.pexpTotal + this.mcstTotal
     },
     changeTimeType () {
+      if (this.timeType === null) return
       console.log(this.timeType)
       console.log(this.timeType.code_CTRL01)
-      this.matInfo.pexp_CPUT_PRCE = this.pexpInit * this.timeType.code_CTRL01
-      this.pexpTotal = this.matInfo.pexp_CPUT_PRCE * this.qty
-      this.total = this.pexpTotal + this.mcstTotal
+      this.timeCost = this.matInfo.pexp_CPUT_PRCE * this.timeType.code_CTRL01
+      this.total = this.pexpTotal + this.mcstTotal + this.timeCost
     },
     changeSpaceType () {
+      if (this.spaceType === null) return
       console.log(this.spaceType)
       console.log(this.spaceType.code_CTRL01)
-      this.matInfo.mcst_CPUT_PRCE = this.mcstInit * this.spaceType.code_CTRL01
-      this.mcstTotal = this.matInfo.mcst_CPUT_PRCE * this.qty
-      this.total = this.pexpTotal + this.mcstTotal
+      this.spaceCost = this.matInfo.mcst_CPUT_PRCE * this.spaceType.code_CTRL01
+      this.total = this.pexpTotal + this.mcstTotal + this.spaceCost
     }
   }
 }
