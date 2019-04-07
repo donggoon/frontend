@@ -196,15 +196,17 @@ import VeeValidate from 'vee-validate'
 Vue.use(VeeValidate)
 
 export default {
-  name: 'DirectCostDetail',
-  props: ['work_NO'],
+  name: 'DirectCostUpdate',
+  props: ['work_NO', 'mat_SEQ'],
   $_veeValidate: {
     validator: 'new'
   },
   data: () => ({
+    directCostDetail: [],
+    directCostDetails: [],
     mcstInit: '',
     pexpInit: '',
-    matQty: '',
+    qty: '',
     pexpTotal: '',
     mcstTotal: '',
     timeCost: '',
@@ -241,31 +243,82 @@ export default {
     demolTypes: [],
     timeTypes: [],
     spaceTypes: [],
+    matQty: null,
     description: ''
   }),
   created () {
     console.log(this.work_NO)
+    console.log(this.mat_SEQ)
     this.$http.get('/m/getWorkType.do').then(resp => {
       this.matTypes = resp.data.response
+      this.matTypes.push({ code_CD: '99', code_DESC1: '단가미적용' })
+      console.log(this.matTypes)
       console.log(resp)
     })
     this.$http.get('/m/getCtrlInfo.do', {
       params: { CLS_ID: 'BSP826' }
     }).then(resp => {
       this.demolTypes = resp.data.response
-      console.log(resp)
     })
     this.$http.get('/m/getCtrlInfo.do', {
       params: { CLS_ID: 'BSP827' }
     }).then(resp => {
       this.timeTypes = resp.data.response
-      console.log(resp)
     })
     this.$http.get('/m/getCtrlInfo.do', {
       params: { CLS_ID: 'BSP828' }
     }).then(resp => {
       this.spaceTypes = resp.data.response
-      console.log(resp)
+    })
+    this.$http.get('/m/getDirectCostDetail.do', {
+      params: { WORK_NO: this.work_NO, MAT_SEQ: this.mat_SEQ }
+    }).then(resp => {
+      this.directCostDetails = resp.data.response
+      this.directCostDetail = this.directCostDetails[0]
+
+      if (this.directCostDetail.wrk_TYPE_CD === null) {
+        this.matType = '99'
+      } else {
+        this.matType = this.directCostDetail.wrk_TYPE_CD
+      }
+      this.matQty = this.directCostDetail.mat_QTY
+      this.demolType = this.directCostDetail.dmol_COST_CD
+      this.timeType = this.directCostDetail.tm_PRI_CD
+      this.spaceType = this.directCostDetail.spac_PRI_CD
+      this.description = this.directCostDetail.rmk_DESC
+
+      if (this.directCostDetail.mat_NO === '*') {
+        this.matInfos.push({
+          mat_NM: this.directCostDetail.mat_NM,
+          mat_NO: this.directCostDetail.mat_NO,
+          mcst_PRCE: this.directCostDetail.mcst_PRCE,
+          pexp_PRCE: this.directCostDetail.pexp_PRCE,
+          pre_YY_MCST_PRCE: null,
+          pre_YY_PEXP_PRCE: null,
+          spec_DESC: this.directCostDetail.spec_DESC,
+          unit_DESC: this.directCostDetail.unit_DESC,
+          use_CD: null,
+          use_NM: null,
+          use_YY: null,
+          wrk_TYPE_CD: null,
+          wrk_TYPE_NM: null
+        })
+        this.matInfo = this.matInfos[0]
+        this.mcstInit = this.matInfo.mcst_PRCE
+        this.pexpInit = this.matInfo.pexp_PRCE
+        console.log(this.matInfos)
+        console.log(this.matInfo)
+        this.changeQty()
+      } else {
+        console.log('else')
+        this.$http.get('/m/getMatInfo.do', {
+          params: { WRK_TYPE_CD: this.directCostDetail.wrk_TYPE_CD, MAT_NO: this.directCostDetail.mat_NO }
+        }).then(resp => {
+          this.matInfos = resp.data.response
+          console.log(resp)
+          console.log(this.matInfos)
+        })
+      }
     })
   },
   mounted () {
@@ -293,6 +346,7 @@ export default {
       })
     },
     changeMatInfo () {
+      console.log(this.matInfo)
       this.mcstInit = this.matInfo.mcst_PRCE
       this.pexpInit = this.matInfo.pexp_PRCE
       this.changeQty()
@@ -306,25 +360,22 @@ export default {
       this.total = this.pexpTotal + this.mcstTotal
     },
     changeDemolType () {
-      if (this.demolType === null) return
       console.log(this.demolType)
-      console.log(this.demolType.code_CTRL01)
+      if (this.demolType === null) return
       this.matInfo.pexp_PRCE = this.pexpInit * this.demolType.code_CTRL01
       this.matInfo.mcst_PRCE = this.mcstInit * this.demolType.code_CTRL01
-      this.pexpTotal = this.matInfo.pexp_PRCE * this.qty
-      this.mcstTotal = this.matInfo.mcst_PRCE * this.qty
+      this.pexpTotal = this.matInfo.pexp_PRCE * this.matQty
+      this.mcstTotal = this.matInfo.mcst_PRCE * this.matQty
       this.total = this.pexpTotal + this.mcstTotal
     },
     changeTimeType () {
-      if (this.timeType === null) return
       console.log(this.timeType)
-      console.log(this.timeType.code_CTRL01)
+      if (this.timeType === null) return
       this.timeCost = this.matInfo.pexp_PRCE * this.timeType.code_CTRL01
     },
     changeSpaceType () {
-      if (this.spaceType === null) return
       console.log(this.spaceType)
-      console.log(this.spaceType.code_CTRL01)
+      if (this.spaceType === null) return
       this.spaceCost = this.matInfo.mcst_PRCE * this.spaceType.code_CTRL01
     }
   }

@@ -4,6 +4,7 @@
       <v-card>
         <v-list two-line>
           <template v-for="(item, index) in items">
+            <router-link :to="{ name: 'DirectCost', params: { work_NO: item.work_NO }}" v-bind:key="item.work_NO">
             <v-list-tile
               :key="item.title"
               avatar
@@ -38,6 +39,7 @@
               v-if="index + 1 < items.length"
               :key="index"
             ></v-divider>
+            </router-link>
           </template>
         </v-list>
       </v-card>

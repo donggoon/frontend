@@ -1,7 +1,9 @@
 <template>
   <form>
     <v-checkbox
-      v-model="subContract"
+      v-model="directCostDetail"
+      :items="directCostDetails"
+      item-value="carr_USE_CD"
       :error-messages="errors.collect('subContract')"
       value="1"
       label="사급유무"
@@ -21,10 +23,10 @@
       v-on:change="changeType(`${matType}`)"
     ></v-select>
     <v-autocomplete
-      v-model="matInfo"
+      v-model="directCostDetail"
       v-validate="'required'"
       :hint="!isEditing ? 'Click the icon to edit' : 'Click the icon to save'"
-      :items="matInfos"
+      :items="directCostDetails"
       item-value="mat_NO"
       item-text="mat_NM"
       :readonly="!isEditing"
@@ -36,9 +38,9 @@
     >
     </v-autocomplete>
     <v-select
-      v-model="matInfo"
+      v-model="directCostDetail"
       v-validate="'required'"
-      :items="matInfos"
+      :items="directCostDetails"
       item-value="spec_DESC"
       item-text="spec_DESC"
       :error-messages="errors.collect('spec')"
@@ -49,9 +51,9 @@
       append-icon
     ></v-select>
     <v-select
-      v-model="matInfo"
+      v-model="directCostDetail"
       v-validate="'required'"
-      :items="matInfos"
+      :items="directCostDetails"
       item-value="unit_DESC"
       item-text="unit_DESC"
       :error-messages="errors.collect('unit')"
@@ -71,9 +73,9 @@
       v-on:change="changeQty()"
     ></v-text-field>
     <v-select
-      v-model="matInfo"
+      v-model="directCostDetail"
       v-validate="'required'"
-      :items="matInfos"
+      :items="directCostDetails"
       item-value="mcst_PRCE"
       item-text="mcst_PRCE"
       :error-messages="errors.collect('mcst')"
@@ -93,9 +95,9 @@
       readonly
     ></v-text-field>
     <v-select
-      v-model="matInfo"
+      v-model="directCostDetail"
       v-validate="'required'"
-      :items="matInfos"
+      :items="directCostDetails"
       item-value="pexp_PRCE"
       item-text="pexp_PRCE"
       :error-messages="errors.collect('pexp')"
@@ -196,15 +198,17 @@ import VeeValidate from 'vee-validate'
 Vue.use(VeeValidate)
 
 export default {
-  name: 'DirectCostDetail',
-  props: ['work_NO'],
+  name: 'DirectCostUpdate',
+  props: ['work_NO', 'mat_SEQ'],
   $_veeValidate: {
     validator: 'new'
   },
   data: () => ({
+    directCostDetail: [],
+    directCostDetails: [],
     mcstInit: '',
     pexpInit: '',
-    matQty: '',
+    qty: '',
     pexpTotal: '',
     mcstTotal: '',
     timeCost: '',
@@ -233,20 +237,21 @@ export default {
       }
     },
     isEditing: true,
-    matInfo: [],
-    matInfos: [],
     demolType: null,
     timeType: null,
     spaceType: null,
     demolTypes: [],
     timeTypes: [],
     spaceTypes: [],
+    matQty: null,
     description: ''
   }),
   created () {
     console.log(this.work_NO)
+    console.log(this.mat_SEQ)
     this.$http.get('/m/getWorkType.do').then(resp => {
       this.matTypes = resp.data.response
+      console.log(this.matTypes)
       console.log(resp)
     })
     this.$http.get('/m/getCtrlInfo.do', {
@@ -265,6 +270,20 @@ export default {
       params: { CLS_ID: 'BSP828' }
     }).then(resp => {
       this.spaceTypes = resp.data.response
+      console.log(resp)
+    })
+    this.$http.get('/m/getDirectCostDetail.do', {
+      params: { WORK_NO: this.work_NO, MAT_SEQ: this.mat_SEQ }
+    }).then(resp => {
+      console.log('getDirectCostDetail')
+      this.directCostDetails = resp.data.response
+      this.directCostDetail = this.directCostDetails[0]
+      this.matType = this.directCostDetail.wrk_TYPE_CD
+      this.matTypes.push({ code_CD: null, code_DESC1: '단가미적용' })
+      this.matQty = this.directCostDetail.mat_QTY
+      this.demolType = this.directCostDetail.dmol_COST_CD
+      this.timeType = this.directCostDetail.tm_PRI_CD
+      this.spaceType = this.directCostDetail.spac_PRI_CD
       console.log(resp)
     })
   },
@@ -293,39 +312,39 @@ export default {
       })
     },
     changeMatInfo () {
-      this.mcstInit = this.matInfo.mcst_PRCE
-      this.pexpInit = this.matInfo.pexp_PRCE
+      this.mcstInit = this.matInfo.mcst_CPUT_PRCE
+      this.pexpInit = this.matInfo.pexp_CPUT_PRCE
       this.changeQty()
       this.changeDemolType()
       this.changeTimeType()
       this.changeSpaceType()
     },
     changeQty () {
-      this.pexpTotal = this.matInfo.pexp_PRCE * this.matQty
-      this.mcstTotal = this.matInfo.mcst_PRCE * this.matQty
+      this.pexpTotal = this.matInfo.pexp_CPUT_PRCE * this.qty
+      this.mcstTotal = this.matInfo.mcst_CPUT_PRCE * this.qty
       this.total = this.pexpTotal + this.mcstTotal
     },
     changeDemolType () {
       if (this.demolType === null) return
       console.log(this.demolType)
       console.log(this.demolType.code_CTRL01)
-      this.matInfo.pexp_PRCE = this.pexpInit * this.demolType.code_CTRL01
-      this.matInfo.mcst_PRCE = this.mcstInit * this.demolType.code_CTRL01
-      this.pexpTotal = this.matInfo.pexp_PRCE * this.qty
-      this.mcstTotal = this.matInfo.mcst_PRCE * this.qty
+      this.matInfo.pexp_CPUT_PRCE = this.pexpInit * this.demolType.code_CTRL01
+      this.matInfo.mcst_CPUT_PRCE = this.mcstInit * this.demolType.code_CTRL01
+      this.pexpTotal = this.matInfo.pexp_CPUT_PRCE * this.qty
+      this.mcstTotal = this.matInfo.mcst_CPUT_PRCE * this.qty
       this.total = this.pexpTotal + this.mcstTotal
     },
     changeTimeType () {
       if (this.timeType === null) return
       console.log(this.timeType)
       console.log(this.timeType.code_CTRL01)
-      this.timeCost = this.matInfo.pexp_PRCE * this.timeType.code_CTRL01
+      this.timeCost = this.matInfo.pexp_CPUT_PRCE * this.timeType.code_CTRL01
     },
     changeSpaceType () {
       if (this.spaceType === null) return
       console.log(this.spaceType)
       console.log(this.spaceType.code_CTRL01)
-      this.spaceCost = this.matInfo.mcst_PRCE * this.spaceType.code_CTRL01
+      this.spaceCost = this.matInfo.mcst_CPUT_PRCE * this.spaceType.code_CTRL01
     }
   }
 }

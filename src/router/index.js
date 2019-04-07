@@ -7,6 +7,7 @@ import Worklist from '@/components/Worklist'
 import Work from '@/components/Work'
 import DirectCost from '@/components/DirectCost'
 import DirectCostDetail from '@/components/DirectCostDetail'
+import DirectCostUpdate from '@/components/DirectCostUpdate'
 
 Vue.use(Router)
 
@@ -40,12 +41,20 @@ export default new Router({
     {
       path: '/directcost',
       name: 'DirectCost',
-      component: DirectCost
+      component: DirectCost,
+      props: true
     },
     {
-      path: '/directcostDetail',
+      path: '/directcostdetail',
       name: 'DirectCostDetail',
-      component: DirectCostDetail
+      component: DirectCostDetail,
+      props: true
+    },
+    {
+      path: '/directcostupdate',
+      name: 'DirectCostUpdate',
+      component: DirectCostUpdate,
+      props: true
     }
   ]
 })
