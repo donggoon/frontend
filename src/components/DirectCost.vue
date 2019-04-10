@@ -3,7 +3,7 @@
     <v-toolbar flat color="white">
       <v-toolbar-title>직접비 현황</v-toolbar-title>
       <v-spacer></v-spacer>
-      <router-link :to="{ name: 'DirectCostDetail', params: { work_NO: this.work_NO }}" v-bind:key="this.work_NO">
+      <router-link :to="{ name: 'DirectCostDetail', params: { work_NO: this.work_NO, mat_SEQ: this.mat_SEQ }}" v-bind:key="this.work_NO">
         <v-btn color="primary" dark @click="expand = !expand">
           {{ expand ? 'Close' : '추가' }}
         </v-btn>
@@ -36,7 +36,7 @@
 <script>
 export default {
   name: 'DirectCost',
-  props: ['work_NO'],
+  props: [ 'work_NO' ],
   data () {
     return {
       expand: false,
@@ -52,7 +52,8 @@ export default {
         { text: '인건비', value: 'pexp_PRCE' },
         { text: '합계', value: 'total_SUM' }
       ],
-      directCosts: []
+      directCosts: [],
+      mat_SEQ: ''
     }
   },
   created () {
@@ -61,6 +62,12 @@ export default {
       params: { WORK_NO: this.work_NO }
     }).then(resp => {
       this.directCosts = resp.data.response
+      if (this.directCosts === null) {
+        this.mat_SEQ = 0
+      } else {
+        this.mat_SEQ = this.directCosts.length + 1
+        console.log(this.mat_SEQ)
+      }
       console.log(this.directCosts)
       console.log(resp)
     })

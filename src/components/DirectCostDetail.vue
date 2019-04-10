@@ -197,7 +197,7 @@ Vue.use(VeeValidate)
 
 export default {
   name: 'DirectCostDetail',
-  props: ['work_NO'],
+  props: ['work_NO', 'mat_SEQ'],
   $_veeValidate: {
     validator: 'new'
   },
@@ -244,7 +244,7 @@ export default {
     description: ''
   }),
   created () {
-    console.log(this.work_NO)
+    console.log(this.work_NO + ' / ' + this.mat_SEQ)
     this.$http.get('/m/getWorkType.do').then(resp => {
       this.matTypes = resp.data.response
       console.log(resp)
@@ -273,7 +273,13 @@ export default {
   },
   methods: {
     submit () {
-      this.$validator.validateAll()
+      this.$http.get('/m/setDirectCost.do', {
+        params: { WORK_NO: this.work_NO }
+      }).then(resp => {
+        this.matInfos = resp.data.response
+        console.log(resp)
+        console.log(this.matInfos)
+      })
     },
     clear () {
       this.name = ''
