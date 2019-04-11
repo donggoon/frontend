@@ -274,11 +274,29 @@ export default {
   methods: {
     submit () {
       this.$http.get('/m/setDirectCost.do', {
-        params: { WORK_NO: this.work_NO }
-      }).then(resp => {
-        this.matInfos = resp.data.response
-        console.log(resp)
-        console.log(this.matInfos)
+        params: {
+          WORK_NO: this.work_NO,
+          MAT_SEQ: this.mat_SEQ,
+          MAT_NO: this.matInfo.mat_NO,
+          CARR_USE_CD: this.subContract,
+          MAT_QTY: this.matQty,
+          MCST_PRCE: this.matInfo.mcst_PRCE,
+          PEXP_PRCE: this.matInfo.pexp_PRCE,
+          TM_PRI_AMT: this.timeCost,
+          DMOL_COST_CD: this.demolType.code_CD,
+          TM_PRI_CD: this.timeType.code_CD,
+          SPAC_PRI_CD: this.spaceType.code_CD,
+          DMOL_COST_APPL_RATE: this.demolType.code_CTRL01,
+          TM_PRI_APPL_RATE: this.timeType.code_CTRL01,
+          SPAC_PRI_APPL_RATE: this.spaceType.code_CTRL01,
+          RMK_DESC: this.description,
+          SPEC_DESC: this.matInfo.spec_DESC,
+          UNIT_DESC: this.matInfo.unit_DESC,
+          MAT_NM: this.matInfo.mat_NM,
+          MCST_AMT: this.mcstTotal,
+          PEXP_AMT: this.pexpTotal,
+          PRI_AMT: this.spaceCost
+        }
       })
     },
     clear () {
@@ -317,8 +335,8 @@ export default {
       console.log(this.demolType.code_CTRL01)
       this.matInfo.pexp_PRCE = this.pexpInit * this.demolType.code_CTRL01
       this.matInfo.mcst_PRCE = this.mcstInit * this.demolType.code_CTRL01
-      this.pexpTotal = this.matInfo.pexp_PRCE * this.qty
-      this.mcstTotal = this.matInfo.mcst_PRCE * this.qty
+      this.pexpTotal = this.matInfo.pexp_PRCE * this.matQty
+      this.mcstTotal = this.matInfo.mcst_PRCE * this.matQty
       this.total = this.pexpTotal + this.mcstTotal
     },
     changeTimeType () {

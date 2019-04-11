@@ -185,8 +185,8 @@
       rows="1"
     ></v-textarea>
 
-    <v-btn @click="submit">submit</v-btn>
-    <v-btn @click="clear">clear</v-btn>
+    <v-btn @click="submit">저장</v-btn>
+    <v-btn @click="clear">삭제</v-btn>
   </form>
 </template>
 
@@ -247,34 +247,35 @@ export default {
     description: ''
   }),
   created () {
-    console.log(this.work_NO)
-    console.log(this.mat_SEQ)
-    this.$http.get('/m/getWorkType.do').then(resp => {
-      this.matTypes = resp.data.response
-      this.matTypes.push({ code_CD: '99', code_DESC1: '단가미적용' })
-      console.log(this.matTypes)
-      console.log(resp)
-    })
-    this.$http.get('/m/getCtrlInfo.do', {
-      params: { CLS_ID: 'BSP826' }
-    }).then(resp => {
-      this.demolTypes = resp.data.response
-    })
-    this.$http.get('/m/getCtrlInfo.do', {
-      params: { CLS_ID: 'BSP827' }
-    }).then(resp => {
-      this.timeTypes = resp.data.response
-    })
-    this.$http.get('/m/getCtrlInfo.do', {
-      params: { CLS_ID: 'BSP828' }
-    }).then(resp => {
-      this.spaceTypes = resp.data.response
-    })
     this.$http.get('/m/getDirectCostDetail.do', {
       params: { WORK_NO: this.work_NO, MAT_SEQ: this.mat_SEQ }
     }).then(resp => {
       this.directCostDetails = resp.data.response
       this.directCostDetail = this.directCostDetails[0]
+      console.log(this.directCostDetail)
+
+      this.$http.get('/m/getWorkType.do').then(resp => {
+        this.matTypes = resp.data.response
+        this.matTypes.push({ code_CD: '99', code_DESC1: '단가미적용' })
+      })
+      this.$http.get('/m/getCtrlInfo.do', {
+        params: { CLS_ID: 'BSP826' }
+      }).then(resp => {
+        this.demolTypes = resp.data.response
+        this.demolType = this.demolTypes[parseInt(this.directCostDetail.dmol_COST_CD, '10')]
+      })
+      this.$http.get('/m/getCtrlInfo.do', {
+        params: { CLS_ID: 'BSP827' }
+      }).then(resp => {
+        this.timeTypes = resp.data.response
+        this.timeType = this.timeTypes[parseInt(this.directCostDetail.tm_PRI_CD, '10')]
+      })
+      this.$http.get('/m/getCtrlInfo.do', {
+        params: { CLS_ID: 'BSP828' }
+      }).then(resp => {
+        this.spaceTypes = resp.data.response
+        this.spaceType = this.spaceTypes[parseInt(this.directCostDetail.spac_PRI_CD, '10')]
+      })
 
       if (this.directCostDetail.wrk_TYPE_CD === null) {
         this.matType = '99'
@@ -282,9 +283,8 @@ export default {
         this.matType = this.directCostDetail.wrk_TYPE_CD
       }
       this.matQty = this.directCostDetail.mat_QTY
-      this.demolType = this.directCostDetail.dmol_COST_CD
-      this.timeType = this.directCostDetail.tm_PRI_CD
-      this.spaceType = this.directCostDetail.spac_PRI_CD
+      this.timeCost = this.directCostDetail.tm_PRI_AMT
+      this.spaceCost = this.directCostDetail.pri_AMT
       this.description = this.directCostDetail.rmk_DESC
 
       if (this.directCostDetail.mat_NO === '*') {
@@ -306,19 +306,15 @@ export default {
         this.matInfo = this.matInfos[0]
         this.mcstInit = this.matInfo.mcst_PRCE
         this.pexpInit = this.matInfo.pexp_PRCE
-        console.log(this.matInfos)
-        console.log(this.matInfo)
-        this.changeQty()
       } else {
         console.log('else')
         this.$http.get('/m/getMatInfo.do', {
           params: { WRK_TYPE_CD: this.directCostDetail.wrk_TYPE_CD, MAT_NO: this.directCostDetail.mat_NO }
         }).then(resp => {
           this.matInfos = resp.data.response
-          console.log(resp)
-          console.log(this.matInfos)
         })
       }
+      this.changeQty()
     })
   },
   mounted () {
@@ -327,6 +323,31 @@ export default {
   methods: {
     submit () {
       this.$validator.validateAll()
+      this.$http.get('/m/updateDirectCost.do', {
+        params: {
+          WORK_NO: this.work_NO,
+          MAT_SEQ: this.mat_SEQ,
+          MAT_NO: this.matInfo.mat_NO,
+          CARR_USE_CD: this.subContract,
+          MAT_QTY: this.matQty,
+          MCST_PRCE: this.matInfo.mcst_PRCE,
+          PEXP_PRCE: this.matInfo.pexp_PRCE,
+          TM_PRI_AMT: this.timeCost,
+          DMOL_COST_CD: this.demolType.code_CD,
+          TM_PRI_CD: this.timeType.code_CD,
+          SPAC_PRI_CD: this.spaceType.code_CD,
+          DMOL_COST_APPL_RATE: this.demolType.code_CTRL01,
+          TM_PRI_APPL_RATE: this.timeType.code_CTRL01,
+          SPAC_PRI_APPL_RATE: this.spaceType.code_CTRL01,
+          RMK_DESC: this.description,
+          SPEC_DESC: this.matInfo.spec_DESC,
+          UNIT_DESC: this.matInfo.unit_DESC,
+          MAT_NM: this.matInfo.mat_NM,
+          MCST_AMT: this.mcstTotal,
+          PEXP_AMT: this.pexpTotal,
+          PRI_AMT: this.spaceCost
+        }
+      })
     },
     clear () {
       this.name = ''
@@ -360,7 +381,6 @@ export default {
       this.total = this.pexpTotal + this.mcstTotal
     },
     changeDemolType () {
-      console.log(this.demolType)
       if (this.demolType === null) return
       this.matInfo.pexp_PRCE = this.pexpInit * this.demolType.code_CTRL01
       this.matInfo.mcst_PRCE = this.mcstInit * this.demolType.code_CTRL01
@@ -369,12 +389,10 @@ export default {
       this.total = this.pexpTotal + this.mcstTotal
     },
     changeTimeType () {
-      console.log(this.timeType)
       if (this.timeType === null) return
       this.timeCost = this.matInfo.pexp_PRCE * this.timeType.code_CTRL01
     },
     changeSpaceType () {
-      console.log(this.spaceType)
       if (this.spaceType === null) return
       this.spaceCost = this.matInfo.mcst_PRCE * this.spaceType.code_CTRL01
     }
