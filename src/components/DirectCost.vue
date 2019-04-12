@@ -13,6 +13,7 @@
       :headers="headers"
       :items="directCosts"
       class="elevation-1"
+      disable-initial-sort
     >
       <template v-slot:items="props">
         <router-link :to="{
@@ -23,13 +24,18 @@
           }
         }">
         <td>{{ props.item.mat_NM }}</td>
+        </router-link>
         <td class="text-xs-right">{{ props.item.mat_QTY }}</td>
         <td class="text-xs-right">{{ props.item.mcst_PRCE }}</td>
         <td class="text-xs-right">{{ props.item.pexp_PRCE }}</td>
         <td class="text-xs-right">{{ props.item.total_SUM }}</td>
-        </router-link>
       </template>
     </v-data-table>
+    <router-link :to="{ name: 'OverheadCost', params: { work_NO: this.work_NO }}">
+      <v-btn color="primary" dark @click="expand = !expand">
+        {{ expand ? 'Close' : '간접비 계산' }}
+      </v-btn>
+    </router-link>
   </div>
 </template>
 
@@ -53,7 +59,12 @@ export default {
         { text: '합계', value: 'total_SUM' }
       ],
       directCosts: [],
-      mat_SEQ: ''
+      mat_SEQ: '',
+      mcstTotal: 0,
+      pexpTotal: 0,
+      timeTotal: 0,
+      spaceTotal: 0,
+      allTotal: 0
     }
   },
   created () {
@@ -62,6 +73,18 @@ export default {
       params: { WORK_NO: this.work_NO }
     }).then(resp => {
       this.directCosts = resp.data.response
+      for (let i = 0; i < this.directCosts.length; i++) {
+        this.mcstTotal += parseInt(this.directCosts[i].mcst_AMT, '10')
+        this.pexpTotal += parseInt(this.directCosts[i].pexp_AMT, '10')
+        this.timeTotal += parseInt(this.directCosts[i].tm_PRI_AMT, '10')
+        this.spaceTotal += parseInt(this.directCosts[i].pri_AMT, '10')
+        this.allTotal += parseInt(this.directCosts[i].total_SUM, '10')
+      }
+      console.log(this.mcstTotal)
+      console.log(this.pexpTotal)
+      console.log(this.timeTotal)
+      console.log(this.spaceTotal)
+      console.log(this.allTotal)
       if (this.directCosts === null) {
         this.mat_SEQ = 0
       } else {
@@ -71,6 +94,23 @@ export default {
       console.log(this.directCosts)
       console.log(resp)
     })
+  },
+  methods: {
+    mergeOverheadCosts () {
+      this.$http.get('/m/mergeOverheadCost.do', {
+        params: { WORK_NO: this.work_NO }
+      }).then(resp => {
+        this.directCosts = resp.data.response
+        if (this.directCosts === null) {
+          this.mat_SEQ = 0
+        } else {
+          this.mat_SEQ = this.directCosts.length + 1
+          console.log(this.mat_SEQ)
+        }
+        console.log(this.directCosts)
+        console.log(resp)
+      })
+    }
   }
 }
 </script>

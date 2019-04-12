@@ -8,6 +8,7 @@ import Work from '@/components/Work'
 import DirectCost from '@/components/DirectCost'
 import DirectCostDetail from '@/components/DirectCostDetail'
 import DirectCostUpdate from '@/components/DirectCostUpdate'
+import OverheadCost from '@/components/OverheadCost'
 
 Vue.use(Router)
 
@@ -54,6 +55,12 @@ export default new Router({
       path: '/directcostupdate',
       name: 'DirectCostUpdate',
       component: DirectCostUpdate,
+      props: true
+    },
+    {
+      path: '/overheadcost',
+      name: 'OverheadCost',
+      component: OverheadCost,
       props: true
     }
   ]

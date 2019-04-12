@@ -185,8 +185,12 @@
       rows="1"
     ></v-textarea>
 
-    <v-btn @click="submit">저장</v-btn>
-    <v-btn @click="clear">삭제</v-btn>
+    <router-link :to="{ name: 'DirectCost', params: { work_NO: this.work_NO }}">
+      <v-btn @click="updateDirectCost">저장</v-btn>
+    </router-link>
+    <router-link :to="{ name: 'DirectCost', params: { work_NO: this.work_NO }}">
+      <v-btn @click="deleteDirectCost">삭제</v-btn>
+    </router-link>
   </form>
 </template>
 
@@ -247,6 +251,8 @@ export default {
     description: ''
   }),
   created () {
+    console.log(this.work_NO)
+    console.log(this.mat_SEQ)
     this.$http.get('/m/getDirectCostDetail.do', {
       params: { WORK_NO: this.work_NO, MAT_SEQ: this.mat_SEQ }
     }).then(resp => {
@@ -258,18 +264,24 @@ export default {
         this.matTypes = resp.data.response
         this.matTypes.push({ code_CD: '99', code_DESC1: '단가미적용' })
       })
+
       this.$http.get('/m/getCtrlInfo.do', {
         params: { CLS_ID: 'BSP826' }
       }).then(resp => {
         this.demolTypes = resp.data.response
         this.demolType = this.demolTypes[parseInt(this.directCostDetail.dmol_COST_CD, '10')]
+        console.log(this.demolType.code_CTRL01)
+        this.mcstInit = this.matInfo.mcst_PRCE / this.demolType.code_CTRL01
+        this.pexpInit = this.matInfo.pexp_PRCE / this.demolType.code_CTRL01
       })
+
       this.$http.get('/m/getCtrlInfo.do', {
         params: { CLS_ID: 'BSP827' }
       }).then(resp => {
         this.timeTypes = resp.data.response
         this.timeType = this.timeTypes[parseInt(this.directCostDetail.tm_PRI_CD, '10')]
       })
+
       this.$http.get('/m/getCtrlInfo.do', {
         params: { CLS_ID: 'BSP828' }
       }).then(resp => {
@@ -282,10 +294,6 @@ export default {
       } else {
         this.matType = this.directCostDetail.wrk_TYPE_CD
       }
-      this.matQty = this.directCostDetail.mat_QTY
-      this.timeCost = this.directCostDetail.tm_PRI_AMT
-      this.spaceCost = this.directCostDetail.pri_AMT
-      this.description = this.directCostDetail.rmk_DESC
 
       if (this.directCostDetail.mat_NO === '*') {
         this.matInfos.push({
@@ -304,24 +312,32 @@ export default {
           wrk_TYPE_NM: null
         })
         this.matInfo = this.matInfos[0]
-        this.mcstInit = this.matInfo.mcst_PRCE
-        this.pexpInit = this.matInfo.pexp_PRCE
+        this.matQty = this.directCostDetail.mat_QTY
+        this.timeCost = this.directCostDetail.tm_PRI_AMT
+        this.spaceCost = this.directCostDetail.pri_AMT
+        this.description = this.directCostDetail.rmk_DESC
+        this.changeQty()
       } else {
         console.log('else')
         this.$http.get('/m/getMatInfo.do', {
           params: { WRK_TYPE_CD: this.directCostDetail.wrk_TYPE_CD, MAT_NO: this.directCostDetail.mat_NO }
         }).then(resp => {
           this.matInfos = resp.data.response
+          this.matInfo = this.matInfos[0]
+          this.matQty = this.directCostDetail.mat_QTY
+          this.timeCost = this.directCostDetail.tm_PRI_AMT
+          this.spaceCost = this.directCostDetail.pri_AMT
+          this.description = this.directCostDetail.rmk_DESC
+          this.changeMatInfo()
         })
       }
-      this.changeQty()
     })
   },
   mounted () {
     this.$validator.localize('en', this.dictionary)
   },
   methods: {
-    submit () {
+    updateDirectCost () {
       this.$validator.validateAll()
       this.$http.get('/m/updateDirectCost.do', {
         params: {
@@ -349,12 +365,14 @@ export default {
         }
       })
     },
-    clear () {
-      this.name = ''
-      this.email = ''
-      this.select = null
-      this.subContract = null
-      this.$validator.reset()
+    deleteDirectCost () {
+      alert('정말 삭제하시겠습니까?')
+      this.$http.get('/m/deleteDirectCost.do', {
+        params: {
+          WORK_NO: this.work_NO,
+          MAT_SEQ: this.mat_SEQ
+        }
+      })
     },
     changeType (type) {
       console.log(type)
@@ -376,6 +394,8 @@ export default {
       this.changeSpaceType()
     },
     changeQty () {
+      console.log(this.matInfo)
+      console.log(this.matInfo.pexp_PRCE)
       this.pexpTotal = this.matInfo.pexp_PRCE * this.matQty
       this.mcstTotal = this.matInfo.mcst_PRCE * this.matQty
       this.total = this.pexpTotal + this.mcstTotal

@@ -185,8 +185,10 @@
       rows="1"
     ></v-textarea>
 
-    <v-btn @click="submit">submit</v-btn>
-    <v-btn @click="clear">clear</v-btn>
+    <v-btn @click="insertDirectCost">저장</v-btn>
+    <router-link :to="{ name: 'DirectCost', params: { work_NO: this.work_NO }}">
+      <v-btn @click="clear">완료</v-btn>
+    </router-link>
   </form>
 </template>
 
@@ -272,7 +274,8 @@ export default {
     this.$validator.localize('en', this.dictionary)
   },
   methods: {
-    submit () {
+    insertDirectCost () {
+      this.$validator.validateAll()
       this.$http.get('/m/setDirectCost.do', {
         params: {
           WORK_NO: this.work_NO,
@@ -298,13 +301,7 @@ export default {
           PRI_AMT: this.spaceCost
         }
       })
-    },
-    clear () {
-      this.name = ''
-      this.email = ''
-      this.select = null
-      this.subContract = null
-      this.$validator.reset()
+      alert('저장되었습니다.')
     },
     changeType (type) {
       console.log(type)
@@ -319,7 +316,10 @@ export default {
     changeMatInfo () {
       this.mcstInit = this.matInfo.mcst_PRCE
       this.pexpInit = this.matInfo.pexp_PRCE
-      this.changeQty()
+      if (this.matQty === null) {
+      } else {
+        this.changeQty()
+      }
       this.changeDemolType()
       this.changeTimeType()
       this.changeSpaceType()
