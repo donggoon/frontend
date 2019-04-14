@@ -1,8 +1,5 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Main from '@/components/Main'
-import Header from '@/components/Header'
-import Worklist from '@/components/Worklist'
 import Work from '@/components/Work'
 import DirectCost from '@/components/DirectCost'
 import DirectCostDetail from '@/components/DirectCostDetail'
@@ -17,21 +14,6 @@ export default new Router({
       path: '/',
       name: 'Work',
       component: Work
-    },
-    {
-      path: '/main',
-      name: 'Main',
-      component: Main,
-      children: [
-        {
-          path: '',
-          component: Header
-        },
-        {
-          path: '',
-          component: Worklist
-        }
-      ]
     },
     {
       path: '/work',

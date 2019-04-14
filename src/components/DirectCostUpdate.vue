@@ -7,6 +7,7 @@
       label="사급유무"
       data-vv-name="subContract"
       type="subContract"
+      :readonly="isFinished"
     ></v-checkbox>
     <v-select
       v-model="matType"
@@ -19,6 +20,7 @@
       data-vv-name="matType"
       required
       v-on:change="changeType(`${matType}`)"
+      :readonly="isFinished"
     ></v-select>
     <v-autocomplete
       v-model="matInfo"
@@ -27,7 +29,7 @@
       :items="matInfos"
       item-value="mat_NO"
       item-text="mat_NM"
-      :readonly="!isEditing"
+      :readonly="isFinished"
       :label="`자재명 — ${isEditing ? 'Editable' : 'Readonly'}`"
       data-vv-name="matInfo"
       persistent-hint
@@ -69,6 +71,7 @@
       data-vv-name="matQty"
       required
       v-on:change="changeQty()"
+      :readonly="isFinished"
     ></v-text-field>
     <v-select
       v-model="matInfo"
@@ -149,6 +152,7 @@
       required
       return-object
       v-on:change="changeDemolType()"
+      :readonly="isFinished"
     ></v-select>
     <v-select
       v-model="timeType"
@@ -162,6 +166,7 @@
       required
       return-object
       v-on:change="changeTimeType()"
+      :readonly="isFinished"
     ></v-select>
     <v-select
       v-model="spaceType"
@@ -175,6 +180,7 @@
       required
       return-object
       v-on:change="changeSpaceType()"
+      :readonly="isFinished"
     ></v-select>
     <v-textarea
       v-model="description"
@@ -183,14 +189,20 @@
       color="deep-purple"
       label="비고"
       rows="1"
+      :readonly="isFinished"
     ></v-textarea>
 
-    <router-link :to="{ name: 'DirectCost', params: { work_NO: this.work_NO }}">
-      <v-btn @click="updateDirectCost">저장</v-btn>
-    </router-link>
-    <router-link :to="{ name: 'DirectCost', params: { work_NO: this.work_NO }}">
-      <v-btn @click="deleteDirectCost">삭제</v-btn>
-    </router-link>
+    <div class="text-xs-center">
+      <router-link :to="{ name: 'DirectCost', params: { work_NO: this.work_NO }}" :hidden="isFinished">
+        <v-btn @click="updateDirectCost" :disabled="isFinished">저장</v-btn>
+      </router-link>
+      <router-link :to="{ name: 'DirectCost', params: { work_NO: this.work_NO }}" :hidden="isFinished">
+        <v-btn @click="deleteDirectCost" :disabled="isFinished">삭제</v-btn>
+      </router-link>
+      <router-link :to="{ name: 'DirectCost', params: { work_NO: this.work_NO }}">
+        <v-btn>돌아가기</v-btn>
+      </router-link>
+    </div>
   </form>
 </template>
 
@@ -201,7 +213,7 @@ Vue.use(VeeValidate)
 
 export default {
   name: 'DirectCostUpdate',
-  props: ['work_NO', 'mat_SEQ'],
+  props: ['work_NO', 'work_PRGS_STAT_CD', 'mat_SEQ'],
   $_veeValidate: {
     validator: 'new'
   },
@@ -222,6 +234,7 @@ export default {
     matType: null,
     matTypes: [],
     subContract: null,
+    isFinished: true,
     dictionary: {
       attributes: {
         email: 'E-mail Address'
@@ -252,20 +265,23 @@ export default {
   }),
   created () {
     console.log(this.work_NO)
+    console.log(this.work_PRGS_STAT_CD)
     console.log(this.mat_SEQ)
-    this.$http.get('/m/getDirectCostDetail.do', {
+    this.isFinished = this.work_PRGS_STAT_CD !== '4'
+    console.log(this.isFinished)
+    this.$http.get('/corp/m/getDirectCostDetail.do', {
       params: { WORK_NO: this.work_NO, MAT_SEQ: this.mat_SEQ }
     }).then(resp => {
       this.directCostDetails = resp.data.response
       this.directCostDetail = this.directCostDetails[0]
       console.log(this.directCostDetail)
 
-      this.$http.get('/m/getWorkType.do').then(resp => {
+      this.$http.get('/corp/m/getWorkType.do').then(resp => {
         this.matTypes = resp.data.response
         this.matTypes.push({ code_CD: '99', code_DESC1: '단가미적용' })
       })
 
-      this.$http.get('/m/getCtrlInfo.do', {
+      this.$http.get('/corp/m/getCtrlInfo.do', {
         params: { CLS_ID: 'BSP826' }
       }).then(resp => {
         this.demolTypes = resp.data.response
@@ -275,14 +291,14 @@ export default {
         this.pexpInit = this.matInfo.pexp_PRCE / this.demolType.code_CTRL01
       })
 
-      this.$http.get('/m/getCtrlInfo.do', {
+      this.$http.get('/corp/m/getCtrlInfo.do', {
         params: { CLS_ID: 'BSP827' }
       }).then(resp => {
         this.timeTypes = resp.data.response
         this.timeType = this.timeTypes[parseInt(this.directCostDetail.tm_PRI_CD, '10')]
       })
 
-      this.$http.get('/m/getCtrlInfo.do', {
+      this.$http.get('/corp/m/getCtrlInfo.do', {
         params: { CLS_ID: 'BSP828' }
       }).then(resp => {
         this.spaceTypes = resp.data.response
@@ -319,7 +335,7 @@ export default {
         this.changeQty()
       } else {
         console.log('else')
-        this.$http.get('/m/getMatInfo.do', {
+        this.$http.get('/corp/m/getMatInfo.do', {
           params: { WRK_TYPE_CD: this.directCostDetail.wrk_TYPE_CD, MAT_NO: this.directCostDetail.mat_NO }
         }).then(resp => {
           this.matInfos = resp.data.response
@@ -339,7 +355,7 @@ export default {
   methods: {
     updateDirectCost () {
       this.$validator.validateAll()
-      this.$http.get('/m/updateDirectCost.do', {
+      this.$http.get('/corp/m/updateDirectCost.do', {
         params: {
           WORK_NO: this.work_NO,
           MAT_SEQ: this.mat_SEQ,
@@ -367,7 +383,7 @@ export default {
     },
     deleteDirectCost () {
       alert('정말 삭제하시겠습니까?')
-      this.$http.get('/m/deleteDirectCost.do', {
+      this.$http.get('/corp/m/deleteDirectCost.do', {
         params: {
           WORK_NO: this.work_NO,
           MAT_SEQ: this.mat_SEQ
@@ -376,7 +392,7 @@ export default {
     },
     changeType (type) {
       console.log(type)
-      this.$http.get('/m/getMatInfo.do', {
+      this.$http.get('/corp/m/getMatInfo.do', {
         params: { WRK_TYPE_CD: type }
       }).then(resp => {
         this.matInfos = resp.data.response

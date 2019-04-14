@@ -185,10 +185,12 @@
       rows="1"
     ></v-textarea>
 
-    <v-btn @click="insertDirectCost">저장</v-btn>
-    <router-link :to="{ name: 'DirectCost', params: { work_NO: this.work_NO }}">
-      <v-btn>완료</v-btn>
-    </router-link>
+    <div class="text-xs-center">
+      <v-btn @click="insertDirectCost">저장</v-btn>
+      <router-link :to="{ name: 'DirectCost', params: { work_NO: this.work_NO }}">
+        <v-btn>완료</v-btn>
+      </router-link>
+    </div>
   </form>
 </template>
 
@@ -199,7 +201,7 @@ Vue.use(VeeValidate)
 
 export default {
   name: 'DirectCostDetail',
-  props: ['work_NO', 'mat_SEQ'],
+  props: ['work_NO', 'work_PRGS_STAT_CD', 'mat_SEQ'],
   $_veeValidate: {
     validator: 'new'
   },
@@ -246,28 +248,23 @@ export default {
     description: ''
   }),
   created () {
-    console.log(this.work_NO + ' / ' + this.mat_SEQ)
-    this.$http.get('/m/getWorkType.do').then(resp => {
+    this.$http.get('/corp/m/getWorkType.do').then(resp => {
       this.matTypes = resp.data.response
-      console.log(resp)
     })
-    this.$http.get('/m/getCtrlInfo.do', {
+    this.$http.get('/corp/m/getCtrlInfo.do', {
       params: { CLS_ID: 'BSP826' }
     }).then(resp => {
       this.demolTypes = resp.data.response
-      console.log(resp)
     })
-    this.$http.get('/m/getCtrlInfo.do', {
+    this.$http.get('/corp/m/getCtrlInfo.do', {
       params: { CLS_ID: 'BSP827' }
     }).then(resp => {
       this.timeTypes = resp.data.response
-      console.log(resp)
     })
-    this.$http.get('/m/getCtrlInfo.do', {
+    this.$http.get('/corp/m/getCtrlInfo.do', {
       params: { CLS_ID: 'BSP828' }
     }).then(resp => {
       this.spaceTypes = resp.data.response
-      console.log(resp)
     })
   },
   mounted () {
@@ -276,7 +273,7 @@ export default {
   methods: {
     insertDirectCost () {
       this.$validator.validateAll()
-      this.$http.get('/m/setDirectCost.do', {
+      this.$http.get('/corp/m/setDirectCost.do', {
         params: {
           WORK_NO: this.work_NO,
           MAT_SEQ: this.mat_SEQ,
