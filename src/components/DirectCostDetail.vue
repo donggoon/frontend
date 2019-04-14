@@ -187,7 +187,7 @@
 
     <v-btn @click="insertDirectCost">저장</v-btn>
     <router-link :to="{ name: 'DirectCost', params: { work_NO: this.work_NO }}">
-      <v-btn @click="clear">완료</v-btn>
+      <v-btn>완료</v-btn>
     </router-link>
   </form>
 </template>
@@ -316,6 +316,8 @@ export default {
     changeMatInfo () {
       this.mcstInit = this.matInfo.mcst_PRCE
       this.pexpInit = this.matInfo.pexp_PRCE
+      // this.matInfo.mcst_PRCE = Math.round(this.matInfo.mcst_PRCE)
+      // this.matInfo.pexp_PRCE = Math.round(this.matInfo.pexp_PRCE)
       if (this.matQty === null) {
       } else {
         this.changeQty()
@@ -325,31 +327,31 @@ export default {
       this.changeSpaceType()
     },
     changeQty () {
-      this.pexpTotal = this.matInfo.pexp_PRCE * this.matQty
-      this.mcstTotal = this.matInfo.mcst_PRCE * this.matQty
-      this.total = this.pexpTotal + this.mcstTotal
+      this.pexpTotal = Math.round(this.matInfo.pexp_PRCE * this.matQty)
+      this.mcstTotal = Math.round(this.matInfo.mcst_PRCE * this.matQty)
+      this.total = Math.round(this.pexpTotal + this.mcstTotal)
     },
     changeDemolType () {
       if (this.demolType === null) return
       console.log(this.demolType)
       console.log(this.demolType.code_CTRL01)
-      this.matInfo.pexp_PRCE = this.pexpInit * this.demolType.code_CTRL01
-      this.matInfo.mcst_PRCE = this.mcstInit * this.demolType.code_CTRL01
-      this.pexpTotal = this.matInfo.pexp_PRCE * this.matQty
-      this.mcstTotal = this.matInfo.mcst_PRCE * this.matQty
-      this.total = this.pexpTotal + this.mcstTotal
+      this.matInfo.pexp_PRCE = Math.round(this.pexpInit * this.demolType.code_CTRL01)
+      this.matInfo.mcst_PRCE = Math.round(this.mcstInit * this.demolType.code_CTRL01)
+      this.pexpTotal = Math.round(this.matInfo.pexp_PRCE * this.matQty)
+      this.mcstTotal = Math.round(this.matInfo.mcst_PRCE * this.matQty)
+      this.total = Math.round(this.pexpTotal + this.mcstTotal)
     },
     changeTimeType () {
       if (this.timeType === null) return
       console.log(this.timeType)
       console.log(this.timeType.code_CTRL01)
-      this.timeCost = this.matInfo.pexp_PRCE * this.timeType.code_CTRL01
+      this.timeCost = Math.round(this.matInfo.pexp_PRCE * this.timeType.code_CTRL01)
     },
     changeSpaceType () {
       if (this.spaceType === null) return
       console.log(this.spaceType)
       console.log(this.spaceType.code_CTRL01)
-      this.spaceCost = this.matInfo.mcst_PRCE * this.spaceType.code_CTRL01
+      this.spaceCost = Math.round(this.matInfo.mcst_PRCE * this.spaceType.code_CTRL01)
     }
   }
 }

@@ -396,25 +396,25 @@ export default {
     changeQty () {
       console.log(this.matInfo)
       console.log(this.matInfo.pexp_PRCE)
-      this.pexpTotal = this.matInfo.pexp_PRCE * this.matQty
-      this.mcstTotal = this.matInfo.mcst_PRCE * this.matQty
-      this.total = this.pexpTotal + this.mcstTotal
+      this.pexpTotal = Math.round(this.matInfo.pexp_PRCE * this.matQty)
+      this.mcstTotal = Math.round(this.matInfo.mcst_PRCE * this.matQty)
+      this.total = Math.round(this.pexpTotal + this.mcstTotal)
     },
     changeDemolType () {
       if (this.demolType === null) return
-      this.matInfo.pexp_PRCE = this.pexpInit * this.demolType.code_CTRL01
-      this.matInfo.mcst_PRCE = this.mcstInit * this.demolType.code_CTRL01
-      this.pexpTotal = this.matInfo.pexp_PRCE * this.matQty
-      this.mcstTotal = this.matInfo.mcst_PRCE * this.matQty
-      this.total = this.pexpTotal + this.mcstTotal
+      this.matInfo.pexp_PRCE = Math.round(this.pexpInit * this.demolType.code_CTRL01)
+      this.matInfo.mcst_PRCE = Math.round(this.mcstInit * this.demolType.code_CTRL01)
+      this.pexpTotal = Math.round(this.matInfo.pexp_PRCE * this.matQty)
+      this.mcstTotal = Math.round(this.matInfo.mcst_PRCE * this.matQty)
+      this.total = Math.round(this.pexpTotal + this.mcstTotal)
     },
     changeTimeType () {
       if (this.timeType === null) return
-      this.timeCost = this.matInfo.pexp_PRCE * this.timeType.code_CTRL01
+      this.timeCost = Math.round(this.matInfo.pexp_PRCE * this.timeType.code_CTRL01)
     },
     changeSpaceType () {
       if (this.spaceType === null) return
-      this.spaceCost = this.matInfo.mcst_PRCE * this.spaceType.code_CTRL01
+      this.spaceCost = Math.round(this.matInfo.mcst_PRCE * this.spaceType.code_CTRL01)
     }
   }
 }

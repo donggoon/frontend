@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
 import Main from '@/components/Main'
 import Header from '@/components/Header'
 import Worklist from '@/components/Worklist'
@@ -16,8 +15,8 @@ export default new Router({
   routes: [
     {
       path: '/',
-      name: 'HelloWorld',
-      component: HelloWorld
+      name: 'Work',
+      component: Work
     },
     {
       path: '/main',

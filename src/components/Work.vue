@@ -74,6 +74,8 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+li a {
+  text-decoration: none;
+}
 </style>
