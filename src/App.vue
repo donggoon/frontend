@@ -14,12 +14,12 @@
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld'
+import Work from './components/Work'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    Work
   },
   data () {
     return {

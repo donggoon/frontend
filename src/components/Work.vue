@@ -4,12 +4,11 @@
       <v-card>
         <v-list two-line>
           <template v-for="(item, index) in items">
-            <router-link :to="{ name: 'DirectCost', params: { work_NO: item.work_NO }}" v-bind:key="item.work_NO">
+            <router-link :to="{ name: 'DirectCost', params: { work_NO: item.work_NO, work_PRGS_STAT_CD: item.work_PRGS_STAT_CD }}" v-bind:key="item.work_NO">
             <v-list-tile
               :key="item.title"
               avatar
               ripple
-              @click="toggle(index)"
             >
               <v-list-tile-content>
                 <v-list-tile-title>{{ item.work_NM }}</v-list-tile-title>
@@ -20,7 +19,7 @@
               <v-list-tile-action>
                 <v-list-tile-action-text>{{ item.pchr_EMPN_NM }}</v-list-tile-action-text>
                 <v-icon
-                  v-if="selected.indexOf(index) < 0"
+                  v-if="item.work_PRGS_STAT_CD !== '4'"
                   color="grey lighten-1"
                 >
                   star_border
@@ -51,22 +50,11 @@
 export default {
   data () {
     return {
-      selected: [2],
       items: []
     }
   },
-  methods: {
-    toggle (index) {
-      const i = this.selected.indexOf(index)
-      if (i > -1) {
-        this.selected.splice(i, 1)
-      } else {
-        this.selected.push(index)
-      }
-    }
-  },
   created () {
-    this.$http.get('/m/M_WORK_WORK_INFO_LIST_07.do').then(resp => {
+    this.$http.get('/corp/m/M_WORK_WORK_INFO_LIST_07.do').then(resp => {
       this.items = resp.data.response
       console.log(resp)
     })
@@ -74,6 +62,8 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+li a {
+  text-decoration: none;
+}
 </style>
