@@ -4,7 +4,16 @@
       <v-card>
         <v-list two-line>
           <template v-for="(item, index) in items">
-            <router-link :to="{ name: 'DirectCost', params: { work_NO: item.work_NO, work_PRGS_STAT_CD: item.work_PRGS_STAT_CD }}" v-bind:key="item.work_NO">
+            <router-link
+              :to="{
+                name: 'DirectCost',
+                params: {
+                  work_NO: item.work_NO,
+                  work_PRGS_STAT_CD: item.work_PRGS_STAT_CD
+                  }
+                }"
+              v-bind:key="item.work_NO"
+              tag="span">
             <v-list-tile
               :key="item.title"
               avatar
@@ -61,9 +70,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-li a {
-  text-decoration: none;
-}
-</style>

@@ -187,7 +187,7 @@
 
     <div class="text-xs-center">
       <v-btn @click="insertDirectCost">저장</v-btn>
-      <router-link :to="{ name: 'DirectCost', params: { work_NO: this.work_NO }}">
+      <router-link :to="{ name: 'DirectCost', params: { work_NO: this.work_NO, work_PRGS_STAT_CD: this.work_PRGS_STAT_CD }}">
         <v-btn>완료</v-btn>
       </router-link>
     </div>
@@ -302,7 +302,7 @@ export default {
     },
     changeType (type) {
       console.log(type)
-      this.$http.get('/m/getMatInfo.do', {
+      this.$http.get('/corp/m/getMatInfo.do', {
         params: { WRK_TYPE_CD: type }
       }).then(resp => {
         this.matInfos = resp.data.response

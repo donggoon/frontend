@@ -1,13 +1,38 @@
 <template>
   <div>
-    <v-toolbar flat color="white">
-      <v-toolbar-title>간접비 현황</v-toolbar-title>
-      <v-spacer></v-spacer>
+    <v-toolbar flat dark color="primary">
       <v-checkbox
         v-model="etcCost"
-        label="잡재료/공구손료"
         @change="changeEtcCost"
       ></v-checkbox>
+      <v-btn
+        :to="{
+          name: 'DirectCost',
+          params: {
+            work_NO: this.work_NO,
+            work_PRGS_STAT_CD: this.work_PRGS_STAT_CD
+          }
+        }"
+        color="pink"
+        dark
+      >직접비 계산</v-btn>
+      <v-btn
+        color="primary"
+        dark
+        @click="updateOverheadCost"
+        :disabled="isFinished">
+        임시저장
+      </v-btn>
+      <v-btn
+        :to="{
+          name: 'Work'
+        }"
+        :hidden="isFinished"
+        color="red"
+        dark
+        @click="updateWorkInfo"
+        :disabled="isFinished"
+      >{{ expand ? 'Close' : '정산요청' }}</v-btn>
     </v-toolbar>
     <v-data-table
       :headers="headers"
@@ -20,7 +45,7 @@
         <td class="text-xs-center">{{ props.item.ocst_NM }}</td>
         <td class="text-xs-right">{{ props.item.appl_AMT }}</td>
         <td class="text-xs-right">{{ props.item.appl_RATE }}</td>
-        <td class="text-xs-center">{{ props.item.appl_NM }}</td>
+        <td class="text-xs-center">{{ props.item.appl_NM === null ? props.item.appl_NM : props.item.appl_NM.substr(0, 8) }}</td>
       </template>
     </v-data-table>
     <v-data-table
@@ -38,24 +63,6 @@
         <td class="text-xs-right">{{ props.item.appl_NM }}</td>
       </template>
     </v-data-table>
-    <div class="text-xs-center">
-      <router-link :to="{
-        name: 'DirectCost',
-        params: {
-          work_NO: this.work_NO
-          }
-        }">
-        <v-btn color="primary" dark>직접비 계산</v-btn>
-      </router-link>
-      <v-btn color="primary" dark @click="updateOverheadCost" :disabled="isFinished">
-        임시저장
-      </v-btn>
-      <router-link :to="{ name: 'Work' }" :hidden="isFinished">
-        <v-btn color="red" dark @click="updateWorkInfo" :disabled="isFinished">
-          {{ expand ? 'Close' : '정산요청' }}
-        </v-btn>
-      </router-link>
-    </div>
   </div>
 </template>
 
@@ -71,25 +78,29 @@ export default {
           text: '구분',
           align: 'center',
           sortable: false,
-          value: 'ocst_NM'
+          value: 'ocst_NM',
+          width: '35%'
         },
         {
           text: '금액',
           align: 'center',
           sortable: false,
-          value: 'appl_AMT'
+          value: 'appl_AMT',
+          width: '20%'
         },
         {
-          text: '적용요율',
+          text: '요율',
           align: 'center',
           sortable: false,
-          value: 'appl_RATE'
+          value: 'appl_RATE',
+          width: '10%'
         },
         {
-          text: '적용기준',
+          text: '적용기준(%)',
           align: 'center',
           sortable: false,
-          value: 'appl_NM'
+          value: 'appl_NM',
+          width: '35%'
         }
       ],
       etcCost: false,
@@ -131,11 +142,11 @@ export default {
       }
       this.workCost = this.directWholeCost + this.overheadWholeCost
       this.overheadCostTotal.push({
-        ocst_NM: '간접비 합계',
+        ocst_NM: '간접비합계',
         appl_AMT: this.overheadWholeCost
       })
       this.overheadCostTotal.push({
-        ocst_NM: '총 합계',
+        ocst_NM: '총계',
         appl_AMT: this.workCost
       })
       this.changeEtcCost()

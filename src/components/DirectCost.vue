@@ -1,22 +1,41 @@
 <template>
   <div>
-    <v-toolbar flat color="white">
-      <v-toolbar-title>직접비 현황</v-toolbar-title>
-      <v-spacer></v-spacer>
-      <router-link :to="{
-        name: 'DirectCostDetail',
-        params: {
-          work_NO: this.work_NO,
-          work_PRGS_STAT_CD: this.work_PRGS_STAT_CD,
-          mat_SEQ: this.mat_SEQ
-        }
-      }"
-      v-bind:key="this.work_NO"
-      :hidden="isFinished">
-        <v-btn color="primary" dark :disabled="isFinished">
-          {{ expand ? 'Close' : '항목추가' }}
-        </v-btn>
-      </router-link>
+    <v-toolbar flat dark color="primary">
+      <v-btn
+        :to="{
+          name: 'Work'
+        }"
+        color="pink"
+        dark
+      >{{ expand ? 'Close' : '공사목록' }}</v-btn>
+      <v-btn
+        :to="{
+          name: 'DirectCostDetail',
+          params: {
+            work_NO: this.work_NO,
+            work_PRGS_STAT_CD: this.work_PRGS_STAT_CD,
+            mat_SEQ: this.mat_SEQ
+          }
+        }"
+        v-bind:key="this.work_NO"
+        :hidden="isFinished"
+        color="pink"
+        dark :disabled="isFinished"
+      >{{ expand ? 'Close' : '항목추가' }}</v-btn>
+      <v-btn
+        :to="{
+          name: 'OverheadCost',
+          params: {
+            work_NO: this.work_NO,
+            work_PRGS_STAT_CD: this.work_PRGS_STAT_CD,
+            pexp_WHOLE_AMT: this.pexpWholeCost,
+            mcst_WHOLE_AMT: this.mcstWholeCost,
+            tm_PRI_WHOLE_AMT: this.timeWholeCost
+          }
+        }"
+        color="red"
+        dark
+      >{{ expand ? 'Close' : '간접비 계산' }}</v-btn>
     </v-toolbar>
     <v-data-table
       :headers="headers"
@@ -33,8 +52,9 @@
             work_PRGS_STAT_CD: work_PRGS_STAT_CD,
             mat_SEQ: props.item.mat_SEQ
           }
-        }">
-        <td class="text-xs-left">{{ props.item.mat_NM }}</td>
+        }"
+        tag="span">
+        <td class="text-xs-left">{{ props.item.mat_NM.substr(props.item.mat_NM.indexOf(':') + 1, props.item.mat_NM.indexOf(':') + 15) }}</td>
         </router-link>
         <td class="text-xs-right">{{ props.item.mat_QTY }}</td>
         <td class="text-xs-right">{{ props.item.total_SUM }}</td>
@@ -54,27 +74,20 @@
         <td class="text-xs-right">{{ props.item.total_SUM }}</td>
       </template>
     </v-data-table>
-    <div class="text-xs-center">
-      <router-link :to="{ name: 'Work' }">
-        <v-btn color="primary" dark>
-          {{ expand ? 'Close' : '공사목록' }}
+    <!-- v-flex xs12 sm12 md6>
+      <v-card>
+        <v-btn
+          absolute
+          dark
+          fab
+          top
+          right
+          color="pink"
+        >
+          <v-icon>add</v-icon>
         </v-btn>
-      </router-link>
-      <router-link :to="{
-        name: 'OverheadCost',
-        params: {
-          work_NO: this.work_NO,
-          work_PRGS_STAT_CD: this.work_PRGS_STAT_CD,
-          pexp_WHOLE_AMT: this.pexpWholeCost,
-          mcst_WHOLE_AMT: this.mcstWholeCost,
-          tm_PRI_WHOLE_AMT: this.timeWholeCost
-          }
-        }">
-        <v-btn color="red" dark>
-          {{ expand ? 'Close' : '간접비 계산' }}
-        </v-btn>
-      </router-link>
-    </div>
+      </v-card>
+    </v-flex -->
   </div>
 </template>
 
@@ -90,19 +103,22 @@ export default {
           text: '품명',
           align: 'center',
           sortable: false,
-          value: 'mat_NM'
+          value: 'mat_NM',
+          width: '65%'
         },
         {
           text: '수량',
           align: 'center',
           sortable: false,
-          value: 'mat_QTY'
+          value: 'mat_QTY',
+          width: '5%'
         },
         {
           text: '합계',
           align: 'center',
           sortable: false,
-          value: 'total_SUM'
+          value: 'total_SUM',
+          width: '20%'
         }
       ],
       directCosts: [],
@@ -143,7 +159,3 @@ export default {
   }
 }
 </script>
-
-<style>
-
-</style>

@@ -310,7 +310,7 @@ export default {
       } else {
         this.matType = this.directCostDetail.wrk_TYPE_CD
       }
-      
+
       if (this.directCostDetail.mat_NO === '*') {
         this.matInfos.push({
           mat_NM: this.directCostDetail.mat_NM,

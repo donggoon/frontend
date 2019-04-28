@@ -10,6 +10,7 @@ import 'vuetify/dist/vuetify.min.css'
 
 Vue.config.productionTip = false
 Vue.prototype.$http = axios
+Vue.prototype.$appName = '시설공사'
 Vue.use(Vuetify)
 
 /* eslint-disable no-new */
