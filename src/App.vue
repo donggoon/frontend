@@ -1,17 +1,12 @@
 <template>
   <v-app>
-    <v-toolbar dark color="primary">
+    <v-toolbar dark color="primary" absolute>
       <v-toolbar-side-icon
         @click.stop="drawer = !drawer"
       >
       </v-toolbar-side-icon>
 
       <v-toolbar-title class="white--text">{{ this.$route.meta.title }}</v-toolbar-title>
-
-      <v-spacer></v-spacer>
-      <v-btn icon>
-        <v-icon>refresh</v-icon>
-      </v-btn>
     </v-toolbar>
 
     <v-navigation-drawer
@@ -40,10 +35,12 @@
           <v-list-tile-action>
             <v-icon>{{ item.icon }}</v-icon>
           </v-list-tile-action>
-
-          <router-link :to="{
-            name: item.link
-          }">
+          <router-link
+            :to="{
+              name: item.link
+            }"
+            tag="li"
+          >
           <v-list-tile-content>
             <v-list-tile-title>{{ item.title }}</v-list-tile-title>
           </v-list-tile-content>
@@ -65,12 +62,12 @@ export default {
       drawer: null,
       items: [
         { title: '외주공사(접수대기) 리스트', icon: 'dashboard', link: 'OverheadCost' },
-        { title: '품질평가 리스트', icon: 'question_answer', link: 'DirectCost' },
-        { title: '정산현황', icon: 'question_answer', link: 'Work' },
-        { title: '표준단가계약', icon: 'question_answer', link: 'DirectCostDetail' },
-        { title: '작업현황조회', icon: 'question_answer', link: 'DirectCostUpdate' },
-        { title: '시설공사 게시판', icon: 'question_answer', link: 'Work' },
-        { title: '협력사 공지', icon: 'question_answer', link: 'Work' }
+        { title: '품질평가 리스트', icon: 'dashboard', link: 'DirectCost1' },
+        { title: '정산현황', icon: 'dashboard', link: 'Work' },
+        { title: '표준단가계약', icon: 'dashboard', link: 'DirectCostDetail' },
+        { title: '작업현황조회', icon: 'dashboard', link: 'DirectCostUpdate' },
+        { title: '시설공사 게시판', icon: 'dashboard', link: 'Work' },
+        { title: '협력사 공지', icon: 'dashboard', link: 'Work' }
       ],
       corpName: '한화시스템/ICT'
     }

@@ -8,6 +8,7 @@
       data-vv-name="subContract"
       type="subContract"
       :readonly="isFinished"
+      class="ml-2 mr-2"
     ></v-checkbox>
     <v-select
       v-model="matType"
@@ -21,6 +22,7 @@
       required
       v-on:change="changeType(`${matType}`)"
       :readonly="isFinished"
+      class="ml-2 mr-2"
     ></v-select>
     <v-autocomplete
       v-model="matInfo"
@@ -35,6 +37,7 @@
       persistent-hint
       return-object
       v-on:change="changeMatInfo()"
+      class="ml-2 mr-2"
     >
     </v-autocomplete>
     <v-select
@@ -49,6 +52,7 @@
       required
       readonly
       append-icon
+      class="ml-2 mr-2"
     ></v-select>
     <v-select
       v-model="matInfo"
@@ -62,6 +66,7 @@
       required
       readonly
       append-icon
+      class="ml-2 mr-2"
     ></v-select>
     <v-text-field
       v-model="matQty"
@@ -72,6 +77,7 @@
       required
       v-on:change="changeQty()"
       :readonly="isFinished"
+      class="ml-2 mr-2"
     ></v-text-field>
     <v-select
       v-model="matInfo"
@@ -85,6 +91,7 @@
       required
       readonly
       append-icon
+      class="ml-2 mr-2"
     ></v-select>
     <v-text-field
       v-model="mcstTotal"
@@ -94,6 +101,7 @@
       data-vv-name="mcstTotal"
       required
       readonly
+      class="ml-2 mr-2"
     ></v-text-field>
     <v-select
       v-model="matInfo"
@@ -107,6 +115,7 @@
       required
       readonly
       append-icon
+      class="ml-2 mr-2"
     ></v-select>
     <v-text-field
       v-model="pexpTotal"
@@ -116,6 +125,7 @@
       data-vv-name="pexpTotal"
       required
       readonly
+      class="ml-2 mr-2"
     ></v-text-field>
     <v-text-field
       v-model="timeCost"
@@ -123,6 +133,7 @@
       label="시간할증금"
       data-vv-name="timeCost"
       readonly
+      class="ml-2 mr-2"
     ></v-text-field>
     <v-text-field
       v-model="total"
@@ -132,6 +143,7 @@
       data-vv-name="total"
       required
       readonly
+      class="ml-2 mr-2"
     ></v-text-field>
     <v-text-field
       v-model="spaceCost"
@@ -139,6 +151,7 @@
       label="공간할증금"
       data-vv-name="spaceCost"
       readonly
+      class="ml-2 mr-2"
     ></v-text-field>
     <v-select
       v-model="demolType"
@@ -153,6 +166,7 @@
       return-object
       v-on:change="changeDemolType()"
       :readonly="isFinished"
+      class="ml-2 mr-2"
     ></v-select>
     <v-select
       v-model="timeType"
@@ -167,6 +181,7 @@
       return-object
       v-on:change="changeTimeType()"
       :readonly="isFinished"
+      class="ml-2 mr-2"
     ></v-select>
     <v-select
       v-model="spaceType"
@@ -181,6 +196,7 @@
       return-object
       v-on:change="changeSpaceType()"
       :readonly="isFinished"
+      class="ml-2 mr-2"
     ></v-select>
     <v-textarea
       v-model="description"
@@ -190,18 +206,42 @@
       label="비고"
       rows="1"
       :readonly="isFinished"
+      class="ml-2 mr-2"
     ></v-textarea>
 
     <div class="text-xs-center">
-      <router-link :to="{ name: 'DirectCost', params: { work_NO: this.work_NO }}" :hidden="isFinished">
-        <v-btn @click="updateDirectCost" :disabled="isFinished">저장</v-btn>
-      </router-link>
-      <router-link :to="{ name: 'DirectCost', params: { work_NO: this.work_NO }}" :hidden="isFinished">
-        <v-btn @click="deleteDirectCost" :disabled="isFinished">삭제</v-btn>
-      </router-link>
-      <router-link :to="{ name: 'DirectCost', params: { work_NO: this.work_NO }}">
-        <v-btn>돌아가기</v-btn>
-      </router-link>
+      <v-btn
+        @click="updateDirectCost"
+        :disabled="isFinished"
+        :to="{
+          name: 'DirectCost',
+          params: {
+            work_NO: this.work_NO,
+            work_PRGS_STAT_CD: this.work_PRGS_STAT_CD
+          }
+        }"
+        :hidden="isFinished"
+      >저장</v-btn>
+      <v-btn
+        @click="deleteDirectCost"
+        :disabled="isFinished"
+        :to="{
+          name: 'DirectCost',
+          params: {
+            work_NO: this.work_NO,
+            work_PRGS_STAT_CD: this.work_PRGS_STAT_CD
+          }
+        }"
+        :hidden="isFinished"
+      >삭제</v-btn>
+      <v-btn
+        :to="{
+          name: 'DirectCost',
+          params: {
+            work_NO: this.work_NO,
+            work_PRGS_STAT_CD: this.work_PRGS_STAT_CD
+          }
+        }">돌아가기</v-btn>
     </div>
   </form>
 </template>

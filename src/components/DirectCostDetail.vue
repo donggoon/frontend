@@ -7,6 +7,7 @@
       label="사급유무"
       data-vv-name="subContract"
       type="subContract"
+      class="ml-2 mr-2"
     ></v-checkbox>
     <v-select
       v-model="matType"
@@ -19,6 +20,7 @@
       data-vv-name="matType"
       required
       v-on:change="changeType(`${matType}`)"
+      class="ml-2 mr-2"
     ></v-select>
     <v-autocomplete
       v-model="matInfo"
@@ -33,6 +35,7 @@
       persistent-hint
       return-object
       v-on:change="changeMatInfo()"
+      class="ml-2 mr-2"
     >
     </v-autocomplete>
     <v-select
@@ -47,6 +50,7 @@
       required
       readonly
       append-icon
+      class="ml-2 mr-2"
     ></v-select>
     <v-select
       v-model="matInfo"
@@ -60,6 +64,7 @@
       required
       readonly
       append-icon
+      class="ml-2 mr-2"
     ></v-select>
     <v-text-field
       v-model="matQty"
@@ -69,6 +74,7 @@
       data-vv-name="matQty"
       required
       v-on:change="changeQty()"
+      class="ml-2 mr-2"
     ></v-text-field>
     <v-select
       v-model="matInfo"
@@ -82,6 +88,7 @@
       required
       readonly
       append-icon
+      class="ml-2 mr-2"
     ></v-select>
     <v-text-field
       v-model="mcstTotal"
@@ -91,6 +98,7 @@
       data-vv-name="mcstTotal"
       required
       readonly
+      class="ml-2 mr-2"
     ></v-text-field>
     <v-select
       v-model="matInfo"
@@ -104,6 +112,7 @@
       required
       readonly
       append-icon
+      class="ml-2 mr-2"
     ></v-select>
     <v-text-field
       v-model="pexpTotal"
@@ -113,6 +122,7 @@
       data-vv-name="pexpTotal"
       required
       readonly
+      class="ml-2 mr-2"
     ></v-text-field>
     <v-text-field
       v-model="timeCost"
@@ -120,6 +130,7 @@
       label="시간할증금"
       data-vv-name="timeCost"
       readonly
+      class="ml-2 mr-2"
     ></v-text-field>
     <v-text-field
       v-model="total"
@@ -129,6 +140,7 @@
       data-vv-name="total"
       required
       readonly
+      class="ml-2 mr-2"
     ></v-text-field>
     <v-text-field
       v-model="spaceCost"
@@ -136,6 +148,7 @@
       label="공간할증금"
       data-vv-name="spaceCost"
       readonly
+      class="ml-2 mr-2"
     ></v-text-field>
     <v-select
       v-model="demolType"
@@ -149,6 +162,7 @@
       required
       return-object
       v-on:change="changeDemolType()"
+      class="ml-2 mr-2"
     ></v-select>
     <v-select
       v-model="timeType"
@@ -162,6 +176,7 @@
       required
       return-object
       v-on:change="changeTimeType()"
+      class="ml-2 mr-2"
     ></v-select>
     <v-select
       v-model="spaceType"
@@ -175,6 +190,7 @@
       required
       return-object
       v-on:change="changeSpaceType()"
+      class="ml-2 mr-2"
     ></v-select>
     <v-textarea
       v-model="description"
@@ -183,8 +199,8 @@
       color="deep-purple"
       label="비고"
       rows="1"
+      class="ml-2 mr-2"
     ></v-textarea>
-
     <div class="text-xs-center">
       <v-btn @click="insertDirectCost">저장</v-btn>
       <router-link :to="{ name: 'DirectCost', params: { work_NO: this.work_NO, work_PRGS_STAT_CD: this.work_PRGS_STAT_CD }}">
