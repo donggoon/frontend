@@ -48,7 +48,7 @@
             work_PRGS_STAT_CD: this.work_PRGS_STAT_CD
           }
         }"
-        color="pink"
+        color="primary"
         dark
         class="pl-0 pr-0"
       >직접비계산</v-btn>
@@ -56,26 +56,15 @@
         color="primary"
         dark
         @click="updateOverheadCost"
-        :disabled="isFinished">
-        임시저장
-      </v-btn>
+        :disabled="isFinished"
+      >임시저장</v-btn>
       <v-btn
-        :to="{
-          name: 'Work'
-        }"
         :hidden="isFinished"
         color="red"
         dark
         @click="updateWorkInfo"
         :disabled="isFinished"
-      >{{ expand ? 'Close' : '정산요청' }}</v-btn>
-      <v-btn
-        :to="{
-          name: 'AttchFile'
-        }"
-        color="red"
-        dark
-      >{{ expand ? 'Close' : 'test' }}</v-btn>
+      >정산요청</v-btn>
     </div>
   </div>
 </template>
@@ -172,6 +161,7 @@ export default {
   },
   methods: {
     updateOverheadCost () {
+      confirm('저장하시겠습니까?')
       for (let i = 0; i < this.overheadCosts.length; i++) {
         this.$http.get('/corp/m/mergeOverheadCost.do', {
           params: {
@@ -199,7 +189,8 @@ export default {
       // this.overheadCostTotal[0].appl_AMT = this.overheadWholeCost
       // this.overheadCostTotal[1].appl_AMT = this.workCost
     },
-    updateWorkInfo () {
+    async updateWorkInfo () {
+      confirm('정산요청 하시겠습니까?')
       for (let i = 0; i < this.overheadCosts.length - 1; i++) {
         this.$http.get('/corp/m/mergeOverheadCost.do', {
           params: {
@@ -210,7 +201,7 @@ export default {
           }
         })
       }
-      this.$http.get('/corp/m/updateWorkInfo.do', {
+      await this.$http.get('/corp/m/updateWorkInfo.do', {
         params: {
           WORK_NO: this.work_NO,
           PEXP_WHOLE_AMT: this.pexpWholeCost,
@@ -221,18 +212,13 @@ export default {
           WRK_COST: this.workCost
         }
       })
+      alert('정산요청 완료되었습니다.')
+      this.$router.push('/worklist')
     }
   }
 }
 </script>
 
 <style>
-  /* This is for documentation purposes and will not be needed in your application */
-  #create .v-speed-dial {
-    position: absolute;
-  }
 
-  #create .v-btn--floating {
-    position: relative;
-  }
 </style>

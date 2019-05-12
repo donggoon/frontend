@@ -2,7 +2,6 @@
   <form>
     <v-checkbox
       v-model="subContract"
-      :error-messages="errors.collect('subContract')"
       value="1"
       label="사급유무"
       data-vv-name="subContract"
@@ -25,12 +24,11 @@
     <v-autocomplete
       v-model="matInfo"
       v-validate="'required'"
-      :hint="!isEditing ? 'Click the icon to edit' : 'Click the icon to save'"
       :items="matInfos"
       item-value="mat_NO"
       item-text="mat_NM"
-      :readonly="!isEditing"
-      :label="`자재명 — ${isEditing ? 'Editable' : 'Readonly'}`"
+      :error-messages="errors.collect('matInfo')"
+      label="자재명"
       data-vv-name="matInfo"
       persistent-hint
       return-object
@@ -44,9 +42,9 @@
       :items="matInfos"
       item-value="spec_DESC"
       item-text="spec_DESC"
-      :error-messages="errors.collect('spec')"
+      :error-messages="errors.collect('specDesc')"
       label="규격"
-      data-vv-name="spec"
+      data-vv-name="specDesc"
       required
       readonly
       append-icon
@@ -58,9 +56,9 @@
       :items="matInfos"
       item-value="unit_DESC"
       item-text="unit_DESC"
-      :error-messages="errors.collect('unit')"
+      :error-messages="errors.collect('unitDesc')"
       label="단위"
-      data-vv-name="unit"
+      data-vv-name="unitDesc"
       required
       readonly
       append-icon
@@ -82,9 +80,9 @@
       :items="matInfos"
       item-value="mcst_PRCE"
       item-text="mcst_PRCE"
-      :error-messages="errors.collect('mcst')"
+      :error-messages="errors.collect('mcstPrice')"
       label="자재비 단가"
-      data-vv-name="mcst"
+      data-vv-name="mcstPrice"
       required
       readonly
       append-icon
@@ -106,9 +104,9 @@
       :items="matInfos"
       item-value="pexp_PRCE"
       item-text="pexp_PRCE"
-      :error-messages="errors.collect('pexp')"
+      :error-messages="errors.collect('pexpPrice')"
       label="인건비 단가"
-      data-vv-name="pexp"
+      data-vv-name="pexpPrice"
       required
       readonly
       append-icon
@@ -126,6 +124,7 @@
     ></v-text-field>
     <v-text-field
       v-model="timeCost"
+      v-validate="'required'"
       :error-messages="errors.collect('timeCost')"
       label="시간할증금"
       data-vv-name="timeCost"
@@ -144,6 +143,7 @@
     ></v-text-field>
     <v-text-field
       v-model="spaceCost"
+      v-validate="'required'"
       :error-messages="errors.collect('spaceCost')"
       label="공간할증금"
       data-vv-name="spaceCost"
@@ -202,10 +202,19 @@
       class="ml-2 mr-2"
     ></v-textarea>
     <div class="text-xs-center">
-      <v-btn @click="insertDirectCost">저장</v-btn>
-      <router-link :to="{ name: 'DirectCost', params: { work_NO: this.work_NO, work_PRGS_STAT_CD: this.work_PRGS_STAT_CD }}">
-        <v-btn>완료</v-btn>
-      </router-link>
+      <v-btn
+        @click="insertDirectCost"
+        color="primary"
+      >저장</v-btn>
+      <v-btn
+        :to="{
+          name: 'DirectCost',
+          params: {
+            work_NO: this.work_NO,
+            work_PRGS_STAT_CD: this.work_PRGS_STAT_CD
+          }
+        }"
+        color="primary">완료</v-btn>
     </div>
   </form>
 </template>
@@ -213,6 +222,7 @@
 <script>
 import Vue from 'vue'
 import VeeValidate from 'vee-validate'
+
 Vue.use(VeeValidate)
 
 export default {
@@ -238,18 +248,21 @@ export default {
     subContract: null,
     dictionary: {
       attributes: {
-        email: 'E-mail Address'
-        // custom attributes
-      },
-      custom: {
-        name: {
-          required: () => 'Name can not be empty',
-          max: 'The name field may not be greater than 10 characters'
-          // custom messages
-        },
-        select: {
-          required: 'Select field is required'
-        }
+        matType: '작업유형',
+        matInfo: '자재명',
+        specDesc: '규격',
+        unitDesc: '단위',
+        matQty: '수량',
+        mcstPrice: '자재비 단가',
+        mcstTotal: '자재비 금액',
+        pexpPrice: '인건비 단가',
+        pexpTotal: '인건비 금액',
+        timeCost: '시간할증금',
+        total: '합계',
+        spaceCost: '공간할증금',
+        demolType: '철거비적용',
+        timeType: '시간할증',
+        spaceType: '공간할증'
       }
     },
     isEditing: true,
@@ -284,11 +297,16 @@ export default {
     })
   },
   mounted () {
-    this.$validator.localize('en', this.dictionary)
+    this.$validator.localize('ko', this.dictionary)
   },
   methods: {
     insertDirectCost () {
+      confirm('저장하시겠습니까?')
       this.$validator.validateAll()
+      if (this.errors.any()) {
+        alert('필수 정보를 입력하세요!')
+        return
+      }
       this.$http.get('/corp/m/setDirectCost.do', {
         params: {
           WORK_NO: this.work_NO,

@@ -24,10 +24,11 @@
                 name: 'DirectCostUpdate',
                 params: {
                   work_NO: work_NO,
-                  work_PRGS_STAT_CD: work_PRGS_STAT_CD
+                  work_PRGS_STAT_CD: work_PRGS_STAT_CD,
+                  mat_SEQ: props.item.mat_SEQ
                 }
               }"
-              tag="li"
+              tag="span"
             >
             <v-card-title>
               <h4>{{ props.item.mat_NM.substr(props.item.mat_NM.indexOf(':') + 1, props.item.mat_NM.indexOf(':') + 15) }}</h4>
@@ -89,7 +90,7 @@
     <v-icon>add</v-icon>
     </v-btn>
     <div class="text-xs-center">
-      <v-btn :to="{ name: 'Work' }" color="primary" dark>
+      <v-btn :to="{ name: 'WorkList' }" color="primary" dark>
         {{ expand ? 'Close' : '공사목록' }}
       </v-btn>
       <v-btn
