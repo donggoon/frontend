@@ -61,11 +61,11 @@ export default {
     return {
       drawer: null,
       items: [
-        { title: '외주공사(접수대기) 리스트', icon: 'dashboard', link: 'OverheadCost' },
-        { title: '품질평가 리스트', icon: 'dashboard', link: 'DirectCost' },
+        { title: '외주공사(접수대기) 리스트', icon: 'dashboard', link: 'WorkList' },
+        { title: '품질평가 리스트', icon: 'dashboard', link: 'WorkList' },
         { title: '정산현황', icon: 'dashboard', link: 'WorkList' },
-        { title: '표준단가계약', icon: 'dashboard', link: 'DirectCostDetail' },
-        { title: '작업현황조회', icon: 'dashboard', link: 'DirectCostUpdate' },
+        { title: '표준단가계약', icon: 'dashboard', link: 'WorkList' },
+        { title: '작업현황조회', icon: 'dashboard', link: 'WorkList' },
         { title: '시설공사 게시판', icon: 'dashboard', link: 'WorkList' },
         { title: '협력사 공지', icon: 'dashboard', link: 'WorkList' }
       ],

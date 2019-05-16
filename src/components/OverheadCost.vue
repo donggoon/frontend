@@ -72,7 +72,7 @@
 <script>
 export default {
   name: 'OverheadCost',
-  props: [ 'work_NO', 'work_PRGS_STAT_CD', 'mcst_WHOLE_AMT', 'pexp_WHOLE_AMT', 'tm_PRI_WHOLE_AMT' ],
+  props: [ 'work_NO', 'work_PRGS_STAT_CD', 'mcst_WHOLE_AMT', 'pexp_WHOLE_AMT', 'tm_PRI_WHOLE_AMT', 'pri_WHOLE_AMT' ],
   data () {
     return {
       expand: false,
@@ -133,7 +133,7 @@ export default {
       this.overheadCosts[1].appl_AMT = Math.round(this.directWholeCost * this.overheadCosts[1].appl_RATE / 100) // 안전관리비
       this.overheadCosts[2].appl_AMT = Math.round(this.pexp_WHOLE_AMT * this.overheadCosts[2].appl_RATE / 100) // 산재보험료
       this.overheadCosts[3].appl_AMT = Math.round(this.pexp_WHOLE_AMT * this.overheadCosts[3].appl_RATE / 100) // 고용보험료
-      this.overheadCosts[5].appl_AMT = Math.round(this.tm_PRI_WHOLE_AMT) // 시간할증금
+      this.overheadCosts[5].appl_AMT = Math.round(this.pri_WHOLE_AMT) // 공간할증금액
       if (this.overheadCosts[0].etc_COST_USE_CD === 'Y') {
         this.etcCost = true
       } else {

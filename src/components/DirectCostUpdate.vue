@@ -2,7 +2,7 @@
   <form>
     <v-checkbox
       v-model="subContract"
-      value="1"
+      value="Y"
       label="사급유무"
       data-vv-name="subContract"
       type="subContract"
@@ -19,7 +19,7 @@
       label="작업유형"
       data-vv-name="matType"
       required
-      v-on:change="changeType(`${matType}`)"
+      @change="changeType(`${matType}`)"
       :readonly="isFinished"
       class="ml-2 mr-2"
     ></v-select>
@@ -34,7 +34,7 @@
       data-vv-name="matInfo"
       persistent-hint
       return-object
-      v-on:change="changeMatInfo()"
+      @change="changeMatInfo"
       class="ml-2 mr-2"
     >
     </v-autocomplete>
@@ -73,7 +73,7 @@
       label="수량"
       data-vv-name="matQty"
       required
-      v-on:change="changeQty()"
+      @change="changeQty"
       :readonly="isFinished"
       class="ml-2 mr-2"
     ></v-text-field>
@@ -81,8 +81,7 @@
       v-model="matInfo"
       v-validate="'required'"
       :items="matInfos"
-      item-value="mcst_PRCE"
-      item-text="mcst_PRCE"
+      :item-value="(this.subContract === null) ? 'mcst_PRCE' : 0"
       :error-messages="errors.collect('mcstPrice')"
       label="자재비 단가"
       data-vv-name="mcstPrice"
@@ -164,7 +163,7 @@
       data-vv-name="demolType"
       required
       return-object
-      v-on:change="changeDemolType()"
+      @change="changeDemolType()"
       :readonly="isFinished"
       class="ml-2 mr-2"
     ></v-select>
@@ -179,7 +178,7 @@
       data-vv-name="timeType"
       required
       return-object
-      v-on:change="changeTimeType()"
+      @change="changeTimeType()"
       :readonly="isFinished"
       class="ml-2 mr-2"
     ></v-select>
@@ -194,7 +193,7 @@
       data-vv-name="spaceType"
       required
       return-object
-      v-on:change="changeSpaceType()"
+      @change="changeSpaceType()"
       :readonly="isFinished"
       class="ml-2 mr-2"
     ></v-select>
@@ -265,6 +264,7 @@ export default {
     directCostDetail: [],
     directCostDetails: [],
     mcstInit: '',
+    mcstInitForSubContract: '',
     pexpInit: '',
     qty: '',
     pexpTotal: '',
@@ -448,13 +448,19 @@ export default {
         params: { WRK_TYPE_CD: type }
       }).then(resp => {
         this.matInfos = resp.data.response
-        console.log(resp)
-        console.log(this.matInfos)
+        this.matInfo.unit_DESC = null
+        this.mcstTotal = 0
+        this.pexpTotal = 0
+        this.timeCost = 0
+        this.total = 0
+        this.spaceCost = 0
       })
     },
     changeMatInfo () {
-      console.log(this.matInfo)
+      console.log(this.matInfo.mcst_PRCE)
+      this.subContract = null
       this.mcstInit = this.matInfo.mcst_PRCE
+      this.mcstInitForSubContract = this.matInfo.mcst_PRCE
       this.pexpInit = this.matInfo.pexp_PRCE
       this.changeQty()
       this.changeDemolType()
@@ -470,19 +476,23 @@ export default {
     },
     changeDemolType () {
       if (this.demolType === null) return
+      if (this.subContract === null) {
+        this.matInfo.mcst_PRCE = Math.round(this.mcstInit * this.demolType.code_CTRL01)
+      } else {
+        this.matInfo.mcst_PRCE = 0
+      }
       this.matInfo.pexp_PRCE = Math.round(this.pexpInit * this.demolType.code_CTRL01)
-      this.matInfo.mcst_PRCE = Math.round(this.mcstInit * this.demolType.code_CTRL01)
       this.pexpTotal = Math.round(this.matInfo.pexp_PRCE * this.matQty)
       this.mcstTotal = Math.round(this.matInfo.mcst_PRCE * this.matQty)
       this.total = Math.round(this.pexpTotal + this.mcstTotal)
     },
     changeTimeType () {
       if (this.timeType === null) return
-      this.timeCost = Math.round(this.matInfo.pexp_PRCE * this.timeType.code_CTRL01)
+      this.timeCost = Math.round(this.pexpTotal * this.timeType.code_CTRL01)
     },
     changeSpaceType () {
       if (this.spaceType === null) return
-      this.spaceCost = Math.round(this.matInfo.mcst_PRCE * this.spaceType.code_CTRL01)
+      this.spaceCost = Math.round(this.pexpTotal * this.spaceType.code_CTRL01)
     }
   }
 }

@@ -35,6 +35,11 @@
               <v-spacer></v-spacer>
               <h4>합계: {{ props.item.total_SUM }}</h4>
             </v-card-title>
+            <div class="text-xs-right mr-3">
+              <span>
+                <h4>시간할증금: {{ props.item.tm_PRI_AMT }}</h4>
+              </span>
+            </div>
             </router-link>
             <v-switch
               v-model="props.item.expanded"
@@ -67,9 +72,14 @@
         </v-flex>
       </template>
     </v-data-iterator>
-    <v-card-title class="justify-end">
-      <h4>직접비합계: {{ mcstWholeCost + pexpWholeCost }}</h4>
-    </v-card-title>
+    <div class="text-xs-right mr-3" color="primary">
+      <span class="justify-end">
+        <h4>직접비합계: {{ mcstWholeCost + pexpWholeCost }}</h4>
+      </span>
+      <span class="justify-end">
+        <h4>시간할증금: {{ timeWholeCost }}</h4>
+      </span>
+    </div>
     <v-btn
       :to="{
         name: 'DirectCostDetail',
@@ -90,9 +100,13 @@
     <v-icon>add</v-icon>
     </v-btn>
     <div class="text-xs-center">
-      <v-btn :to="{ name: 'WorkList' }" color="primary" dark>
-        {{ expand ? 'Close' : '공사목록' }}
-      </v-btn>
+      <v-btn
+        :to="{
+          name: 'WorkList'
+        }"
+        color="primary"
+        dark
+      >공사목록</v-btn>
       <v-btn
         :to="{
           name: 'OverheadCost',
@@ -101,13 +115,26 @@
             work_PRGS_STAT_CD: this.work_PRGS_STAT_CD,
             pexp_WHOLE_AMT: this.pexpWholeCost,
             mcst_WHOLE_AMT: this.mcstWholeCost,
-            tm_PRI_WHOLE_AMT: this.timeWholeCost
+            tm_PRI_WHOLE_AMT: this.timeWholeCost,
+            pri_WHOLE_AMT: this.spaceWholeCost
           }
         }"
         color="red"
         dark
         class="pl-0 pr-0"
-      >{{ expand ? 'Close' : '간접비현황' }}</v-btn>
+      >간접비현황</v-btn>
+      <v-btn
+        :to="{
+          name: 'DirectCostDetail',
+          params: {
+            work_NO: this.work_NO,
+            work_PRGS_STAT_CD: this.work_PRGS_STAT_CD,
+            mat_SEQ: this.mat_SEQ
+          }
+        }"
+        color="primary"
+        dark
+      >항목추가</v-btn>
     </div>
   </div>
 </template>
@@ -130,7 +157,8 @@ export default {
       timeWholeCost: 0,
       spaceWholeCost: 0,
       directWholeCost: 0,
-      isFinished: true
+      isFinished: true,
+      alert: true
     }
   },
   created () {
