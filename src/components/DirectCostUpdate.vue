@@ -8,6 +8,7 @@
       type="subContract"
       :readonly="isFinished"
       class="ml-2 mr-2"
+      @change="changeSubContract"
     ></v-checkbox>
     <v-select
       v-model="matType"
@@ -81,7 +82,8 @@
       v-model="matInfo"
       v-validate="'required'"
       :items="matInfos"
-      :item-value="(this.subContract === null) ? 'mcst_PRCE' : 0"
+      :item-value="(this.subContract === null) ? 'mcst_PRCE' : 'mcst_FOR_SUB_CONTRACT'"
+      :item-text="(this.subContract === null) ? 'mcst_PRCE' : 'mcst_FOR_SUB_CONTRACT'"
       :error-messages="errors.collect('mcstPrice')"
       label="자재비 단가"
       data-vv-name="mcstPrice"
@@ -264,7 +266,6 @@ export default {
     directCostDetail: [],
     directCostDetails: [],
     mcstInit: '',
-    mcstInitForSubContract: '',
     pexpInit: '',
     qty: '',
     pexpTotal: '',
@@ -311,17 +312,12 @@ export default {
     description: ''
   }),
   created () {
-    console.log(this.work_NO)
-    console.log(this.work_PRGS_STAT_CD)
-    console.log(this.mat_SEQ)
     this.isFinished = this.work_PRGS_STAT_CD !== '4'
-    console.log(this.isFinished)
     this.$http.get('/corp/m/getDirectCostDetail.do', {
       params: { WORK_NO: this.work_NO, MAT_SEQ: this.mat_SEQ }
     }).then(resp => {
       this.directCostDetails = resp.data.response
       this.directCostDetail = this.directCostDetails[0]
-      console.log(this.directCostDetail)
 
       this.$http.get('/corp/m/getWorkType.do').then(resp => {
         this.matTypes = resp.data.response
@@ -381,7 +377,6 @@ export default {
         this.description = this.directCostDetail.rmk_DESC
         this.changeQty()
       } else {
-        console.log('else')
         this.$http.get('/corp/m/getMatInfo.do', {
           params: { WRK_TYPE_CD: this.directCostDetail.wrk_TYPE_CD, MAT_NO: this.directCostDetail.mat_NO }
         }).then(resp => {
@@ -470,8 +465,10 @@ export default {
     changeQty () {
       console.log(this.matInfo)
       console.log(this.matInfo.pexp_PRCE)
+      console.log(this.subContract)
       this.pexpTotal = Math.round(this.matInfo.pexp_PRCE * this.matQty)
-      this.mcstTotal = Math.round(this.matInfo.mcst_PRCE * this.matQty)
+      if (this.subContract) this.mcstTotal = 0
+      else this.mcstTotal = Math.round(this.matInfo.mcst_PRCE * this.matQty)
       this.total = Math.round(this.pexpTotal + this.mcstTotal)
     },
     changeDemolType () {
@@ -483,7 +480,8 @@ export default {
       }
       this.matInfo.pexp_PRCE = Math.round(this.pexpInit * this.demolType.code_CTRL01)
       this.pexpTotal = Math.round(this.matInfo.pexp_PRCE * this.matQty)
-      this.mcstTotal = Math.round(this.matInfo.mcst_PRCE * this.matQty)
+      if (this.subContract) this.mcstTotal = 0
+      else this.mcstTotal = Math.round(this.matInfo.mcst_PRCE * this.matQty)
       this.total = Math.round(this.pexpTotal + this.mcstTotal)
     },
     changeTimeType () {
@@ -493,6 +491,9 @@ export default {
     changeSpaceType () {
       if (this.spaceType === null) return
       this.spaceCost = Math.round(this.pexpTotal * this.spaceType.code_CTRL01)
+    },
+    changeSubContract () {
+      this.changeQty()
     }
   }
 }
