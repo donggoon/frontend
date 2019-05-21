@@ -125,7 +125,7 @@ export default {
     this.isFinished = this.work_PRGS_STAT_CD !== '4'
     console.log(this.isFinished)
     this.directWholeCost = this.mcst_WHOLE_AMT + this.pexp_WHOLE_AMT
-    this.$http.get('/corp/m/selectOverheadCost.do', {
+    this.$http.get('/m/selectOverheadCost.do', {
       params: { WORK_NO: this.work_NO }
     }).then(resp => {
       this.overheadCosts = resp.data.response
@@ -163,7 +163,7 @@ export default {
     updateOverheadCost () {
       confirm('저장하시겠습니까?')
       for (let i = 0; i < this.overheadCosts.length; i++) {
-        this.$http.get('/corp/m/mergeOverheadCost.do', {
+        this.$http.get('/m/mergeOverheadCost.do', {
           params: {
             WORK_NO: this.work_NO,
             OCST_CD: this.overheadCosts[i].ocst_CD,
@@ -186,13 +186,11 @@ export default {
         this.overheadWholeCost += parseInt(this.overheadCosts[i].appl_AMT, '10')
       }
       this.workCost = this.directWholeCost + this.overheadWholeCost
-      // this.overheadCostTotal[0].appl_AMT = this.overheadWholeCost
-      // this.overheadCostTotal[1].appl_AMT = this.workCost
     },
     async updateWorkInfo () {
       confirm('정산요청 하시겠습니까?')
       for (let i = 0; i < this.overheadCosts.length - 1; i++) {
-        this.$http.get('/corp/m/mergeOverheadCost.do', {
+        this.$http.get('/m/mergeOverheadCost.do', {
           params: {
             WORK_NO: this.work_NO,
             OCST_CD: this.overheadCosts[i].ocst_CD,
@@ -201,7 +199,7 @@ export default {
           }
         })
       }
-      await this.$http.get('/corp/m/updateWorkInfo.do', {
+      await this.$http.get('/m/updateWorkInfo.do', {
         params: {
           WORK_NO: this.work_NO,
           PEXP_WHOLE_AMT: this.pexpWholeCost,

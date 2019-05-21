@@ -163,7 +163,7 @@ export default {
   },
   created () {
     this.isFinished = false
-    this.$http.get('/corp/m/getDirectCost.do', {
+    this.$http.get('/m/getDirectCost.do', {
       params: { WORK_NO: this.work_NO }
     }).then(resp => {
       this.directCosts = resp.data.response

@@ -2,11 +2,12 @@
   <form>
     <v-checkbox
       v-model="subContract"
+      value="Y"
       label="사급유무"
       data-vv-name="subContract"
       type="subContract"
       class="ml-2 mr-2"
-      v-on:change="changeSubContract()"
+      @change="changeSubContract"
     ></v-checkbox>
     <v-select
       v-model="matType"
@@ -78,8 +79,8 @@
       v-model="matInfo"
       v-validate="'required'"
       :items="matInfos"
-      item-value="mcst_PRCE"
-      item-text="mcst_PRCE"
+      :item-value="(this.subContract === null) ? 'mcst_PRCE' : 'mcst_FOR_SUB_CONTRACT'"
+      :item-text="(this.subContract === null) ? 'mcst_PRCE' : 'mcst_FOR_SUB_CONTRACT'"
       :error-messages="errors.collect('mcstPrice')"
       label="자재비 단가"
       data-vv-name="mcstPrice"
@@ -277,23 +278,26 @@ export default {
     description: ''
   }),
   created () {
-    this.$http.get('/corp/m/getWorkType.do').then(resp => {
+    this.$http.get('/m/getWorkType.do').then(resp => {
       this.matTypes = resp.data.response
     })
-    this.$http.get('/corp/m/getCtrlInfo.do', {
+    this.$http.get('/m/getCtrlInfo.do', {
       params: { CLS_ID: 'BSP826' }
     }).then(resp => {
       this.demolTypes = resp.data.response
+      this.demolType = '0'
     })
-    this.$http.get('/corp/m/getCtrlInfo.do', {
+    this.$http.get('/m/getCtrlInfo.do', {
       params: { CLS_ID: 'BSP827' }
     }).then(resp => {
       this.timeTypes = resp.data.response
+      this.timeType = '00'
     })
-    this.$http.get('/corp/m/getCtrlInfo.do', {
+    this.$http.get('/m/getCtrlInfo.do', {
       params: { CLS_ID: 'BSP828' }
     }).then(resp => {
       this.spaceTypes = resp.data.response
+      this.spaceType = '00'
     })
   },
   mounted () {
@@ -307,14 +311,14 @@ export default {
         alert('필수 정보를 입력하세요!')
         return
       }
-      this.$http.get('/corp/m/setDirectCost.do', {
+      this.$http.get('/m/setDirectCost.do', {
         params: {
           WORK_NO: this.work_NO,
           MAT_SEQ: this.mat_SEQ,
           MAT_NO: this.matInfo.mat_NO,
           CARR_USE_CD: this.subContract,
           MAT_QTY: this.matQty,
-          MCST_PRCE: this.matInfo.mcst_PRCE,
+          MCST_PRCE: this.subContract === null ? this.matInfo.mcst_PRCE : 0,
           PEXP_PRCE: this.matInfo.pexp_PRCE,
           TM_PRI_AMT: this.timeCost,
           DMOL_COST_CD: this.demolType.code_CD,
@@ -336,7 +340,7 @@ export default {
     },
     changeType (type) {
       console.log(type)
-      this.$http.get('/corp/m/getMatInfo.do', {
+      this.$http.get('/m/getMatInfo.do', {
         params: { WRK_TYPE_CD: type }
       }).then(resp => {
         this.matInfos = resp.data.response
@@ -345,47 +349,43 @@ export default {
       })
     },
     changeMatInfo () {
+      this.subContract = null
       this.mcstInit = this.matInfo.mcst_PRCE
+      this.mcstInitForSubContract = this.matInfo.mcst_PRCE
       this.pexpInit = this.matInfo.pexp_PRCE
-      // this.matInfo.mcst_PRCE = Math.round(this.matInfo.mcst_PRCE)
-      // this.matInfo.pexp_PRCE = Math.round(this.matInfo.pexp_PRCE)
-      if (this.matQty === null) {
-      } else {
+      if (this.matQty !== null) {
         this.changeQty()
+        this.changeDemolType()
+        this.changeTimeType()
+        this.changeSpaceType()
       }
-      this.changeDemolType()
-      this.changeTimeType()
-      this.changeSpaceType()
     },
     changeQty () {
-      this.pexpTotal = Math.round(this.matInfo.pexp_PRCE * this.matQty)
-      this.mcstTotal = Math.round(this.matInfo.mcst_PRCE * this.matQty)
-      this.total = Math.round(this.pexpTotal + this.mcstTotal)
+      this.pexpTotal = Math.round(this.matInfo.pexp_PRCE * this.matQty * 10) / 10
+      if (this.subContract) this.mcstTotal = 0
+      else this.mcstTotal = Math.round(this.matInfo.mcst_PRCE * this.matQty * 10) / 10
+      this.total = Math.round((this.pexpTotal + this.mcstTotal) * 10) / 10
     },
     changeDemolType () {
-      if (this.demolType === null) return
-      console.log(this.demolType)
-      console.log(this.demolType.code_CTRL01)
-      this.matInfo.pexp_PRCE = Math.round(this.pexpInit * this.demolType.code_CTRL01)
-      this.matInfo.mcst_PRCE = Math.round(this.mcstInit * this.demolType.code_CTRL01)
-      this.pexpTotal = Math.round(this.matInfo.pexp_PRCE * this.matQty)
-      this.mcstTotal = Math.round(this.matInfo.mcst_PRCE * this.matQty)
-      this.total = Math.round(this.pexpTotal + this.mcstTotal)
+      if (this.matQty === null) return
+      if (this.subContract === null) this.matInfo.mcst_PRCE = Math.round(this.mcstInit * this.demolType.code_CTRL01 * 10) / 10
+      else this.matInfo.mcst_PRCE = 0
+      this.matInfo.pexp_PRCE = Math.round(this.pexpInit * this.demolType.code_CTRL01 * 10) / 10
+      this.pexpTotal = Math.round(this.matInfo.pexp_PRCE * this.matQty * 10) / 10
+      if (this.subContract) this.mcstTotal = 0
+      else this.mcstTotal = Math.round(this.matInfo.mcst_PRCE * this.matQty * 10) / 10
+      this.total = Math.round((this.pexpTotal + this.mcstTotal) * 10) / 10
     },
     changeTimeType () {
-      if (this.timeType === null) return
-      console.log(this.timeType)
-      console.log(this.timeType.code_CTRL01)
+      if (this.matQty === null) return
       this.timeCost = Math.round(this.pexpTotal * this.timeType.code_CTRL01)
     },
     changeSpaceType () {
-      if (this.spaceType === null) return
-      console.log(this.spaceType)
-      console.log(this.spaceType.code_CTRL01)
+      if (this.matQty === null) return
       this.spaceCost = Math.round(this.pexpTotal * this.spaceType.code_CTRL01)
     },
     changeSubContract () {
-      console.log(this.subContract)
+      this.changeQty()
     }
   }
 }
