@@ -22,6 +22,16 @@
       v-on:change="changeType(`${matType}`)"
       class="ml-2 mr-2"
     ></v-select>
+    <v-text-field
+      v-model="matQty"
+      v-validate="'required'"
+      :error-messages="errors.collect('matQty')"
+      label="자재명"
+      data-vv-name="matQty"
+      required
+      v-on:change="changeQty()"
+      class="ml-2 mr-2"
+    ></v-text-field>
     <v-autocomplete
       v-model="matInfo"
       v-validate="'required'"
@@ -124,21 +134,21 @@
       class="ml-2 mr-2"
     ></v-text-field>
     <v-text-field
-      v-model="timeCost"
-      v-validate="'required'"
-      :error-messages="errors.collect('timeCost')"
-      label="시간할증금"
-      data-vv-name="timeCost"
-      readonly
-      class="ml-2 mr-2"
-    ></v-text-field>
-    <v-text-field
       v-model="total"
       v-validate="'required'"
       :error-messages="errors.collect('total')"
       label="합계"
       data-vv-name="total"
       required
+      readonly
+      class="ml-2 mr-2"
+    ></v-text-field>
+    <v-text-field
+      v-model="timeCost"
+      v-validate="'required'"
+      :error-messages="errors.collect('timeCost')"
+      label="시간할증금"
+      data-vv-name="timeCost"
       readonly
       class="ml-2 mr-2"
     ></v-text-field>
@@ -215,7 +225,7 @@
             work_PRGS_STAT_CD: this.work_PRGS_STAT_CD
           }
         }"
-        color="primary">완료</v-btn>
+        color="primary">돌아가기</v-btn>
     </div>
   </form>
 </template>
@@ -235,7 +245,7 @@ export default {
   data: () => ({
     mcstInit: '',
     pexpInit: '',
-    matQty: '',
+    matQty: null,
     pexpTotal: '',
     mcstTotal: '',
     timeCost: '',
@@ -275,43 +285,44 @@ export default {
     demolTypes: [],
     timeTypes: [],
     spaceTypes: [],
-    description: ''
+    description: null
   }),
   created () {
     this.$http.get('/m/getWorkType.do').then(resp => {
       this.matTypes = resp.data.response
+      this.matTypes.push({ code_CD: '99', code_DESC1: '단가미적용' })
     })
     this.$http.get('/m/getCtrlInfo.do', {
       params: { CLS_ID: 'BSP826' }
     }).then(resp => {
       this.demolTypes = resp.data.response
-      this.demolType = '0'
+      this.demolType = this.demolTypes[0]
     })
     this.$http.get('/m/getCtrlInfo.do', {
       params: { CLS_ID: 'BSP827' }
     }).then(resp => {
       this.timeTypes = resp.data.response
-      this.timeType = '00'
+      this.timeType = this.timeTypes[0]
     })
     this.$http.get('/m/getCtrlInfo.do', {
       params: { CLS_ID: 'BSP828' }
     }).then(resp => {
       this.spaceTypes = resp.data.response
-      this.spaceType = '00'
+      this.spaceType = this.spaceTypes[0]
     })
   },
   mounted () {
     this.$validator.localize('ko', this.dictionary)
   },
   methods: {
-    insertDirectCost () {
-      confirm('저장하시겠습니까?')
+    async insertDirectCost () {
+      if (!confirm('저장하시겠습니까?')) return
       this.$validator.validateAll()
       if (this.errors.any()) {
         alert('필수 정보를 입력하세요!')
         return
       }
-      this.$http.get('/m/setDirectCost.do', {
+      await this.$http.get('/m/setDirectCost.do', {
         params: {
           WORK_NO: this.work_NO,
           MAT_SEQ: this.mat_SEQ,
@@ -337,6 +348,13 @@ export default {
         }
       })
       alert('저장되었습니다.')
+      this.$router.push({
+        name: 'DirectCost',
+        params: {
+          work_NO: this.work_NO,
+          work_PRGS_STAT_CD: this.work_PRGS_STAT_CD
+        }
+      })
     },
     changeType (type) {
       console.log(type)
@@ -355,10 +373,10 @@ export default {
       this.pexpInit = this.matInfo.pexp_PRCE
       if (this.matQty !== null) {
         this.changeQty()
-        this.changeDemolType()
-        this.changeTimeType()
-        this.changeSpaceType()
       }
+      this.changeDemolType()
+      this.changeTimeType()
+      this.changeSpaceType()
     },
     changeQty () {
       this.pexpTotal = Math.round(this.matInfo.pexp_PRCE * this.matQty * 10) / 10
@@ -377,12 +395,12 @@ export default {
       this.total = Math.round((this.pexpTotal + this.mcstTotal) * 10) / 10
     },
     changeTimeType () {
-      if (this.matQty === null) return
-      this.timeCost = Math.round(this.pexpTotal * this.timeType.code_CTRL01)
+      if (this.timeType === '00') this.timeCost = 0
+      else this.timeCost = Math.round(this.pexpTotal * this.timeType.code_CTRL01)
     },
     changeSpaceType () {
-      if (this.matQty === null) return
-      this.spaceCost = Math.round(this.pexpTotal * this.spaceType.code_CTRL01)
+      if (this.spaceType === '00') this.spaceCost = 0
+      else this.spaceCost = Math.round(this.pexpTotal * this.spaceType.code_CTRL01)
     },
     changeSubContract () {
       this.changeQty()

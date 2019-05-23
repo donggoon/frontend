@@ -11,6 +11,14 @@ Vue.use(Router)
 export default new Router({
   routes: [
     {
+      path: '/',
+      name: 'WorkList',
+      component: WorkList,
+      meta: {
+        title: '정산서 현황'
+      }
+    },
+    {
       path: '/worklist',
       name: 'WorkList',
       component: WorkList,

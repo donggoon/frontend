@@ -213,13 +213,6 @@
     <div class="text-xs-center">
       <v-btn
         @click="updateDirectCost"
-        :to="{
-          name: 'DirectCost',
-          params: {
-            work_NO: this.work_NO,
-            work_PRGS_STAT_CD: this.work_PRGS_STAT_CD
-          }
-        }"
         :disabled="isFinished"
         :hidden="isFinished"
         color="primary"
@@ -227,13 +220,6 @@
       <v-btn
         @click="deleteDirectCost"
         :disabled="isFinished"
-        :to="{
-          name: 'DirectCost',
-          params: {
-            work_NO: this.work_NO,
-            work_PRGS_STAT_CD: this.work_PRGS_STAT_CD
-          }
-        }"
         :hidden="isFinished"
         color="primary"
       >삭제</v-btn>
@@ -395,14 +381,14 @@ export default {
     this.$validator.localize('ko', this.dictionary)
   },
   methods: {
-    updateDirectCost () {
-      confirm('저장하시겠습니까?')
+    async updateDirectCost () {
+      if (!confirm('저장하시겠습니까?')) return
       this.$validator.validateAll()
       if (this.errors.any()) {
         alert('필수 정보를 입력하세요!')
         return
       }
-      this.$http.get('/m/updateDirectCost.do', {
+      await this.$http.get('/m/updateDirectCost.do', {
         params: {
           WORK_NO: this.work_NO,
           MAT_SEQ: this.mat_SEQ,
@@ -427,13 +413,29 @@ export default {
           PRI_AMT: this.spaceCost
         }
       })
+      alert('저장되었습니다.')
+      this.$router.push({
+        name: 'DirectCost',
+        params: {
+          work_NO: this.work_NO,
+          work_PRGS_STAT_CD: this.work_PRGS_STAT_CD
+        }
+      })
     },
-    deleteDirectCost () {
-      confirm('정말 삭제하시겠습니까?')
-      this.$http.get('/m/deleteDirectCost.do', {
+    async deleteDirectCost () {
+      if (!confirm('정말 삭제하시겠습니까?')) return
+      await this.$http.get('/m/deleteDirectCost.do', {
         params: {
           WORK_NO: this.work_NO,
           MAT_SEQ: this.mat_SEQ
+        }
+      })
+      alert('삭제되었습니다.')
+      this.$router.push({
+        name: 'DirectCost',
+        params: {
+          work_NO: this.work_NO,
+          work_PRGS_STAT_CD: this.work_PRGS_STAT_CD
         }
       })
     },
@@ -455,7 +457,9 @@ export default {
       this.mcstInit = this.matInfo.mcst_PRCE
       this.mcstInitForSubContract = this.matInfo.mcst_PRCE
       this.pexpInit = this.matInfo.pexp_PRCE
-      this.changeQty()
+      if (this.matQty !== null) {
+        this.changeQty()
+      }
       this.changeDemolType()
       this.changeTimeType()
       this.changeSpaceType()
@@ -467,7 +471,7 @@ export default {
       this.total = Math.round((this.pexpTotal + this.mcstTotal) * 10) / 10
     },
     changeDemolType () {
-      if (this.demolType === null) return
+      if (this.matQty === null) return
       if (this.subContract === null) this.matInfo.mcst_PRCE = Math.round(this.mcstInit * this.demolType.code_CTRL01 * 10) / 10
       else this.matInfo.mcst_PRCE = 0
       this.matInfo.pexp_PRCE = Math.round(this.pexpInit * this.demolType.code_CTRL01 * 10) / 10
@@ -477,12 +481,12 @@ export default {
       this.total = Math.round((this.pexpTotal + this.mcstTotal) * 10) / 10
     },
     changeTimeType () {
-      if (this.timeType === null) return
-      this.timeCost = Math.round(this.pexpTotal * this.timeType.code_CTRL01)
+      if (this.timeType === '00') this.timeCost = 0
+      else this.timeCost = Math.round(this.pexpTotal * this.timeType.code_CTRL01)
     },
     changeSpaceType () {
-      if (this.spaceType === null) return
-      this.spaceCost = Math.round(this.pexpTotal * this.spaceType.code_CTRL01)
+      if (this.spaceType === '00') this.spaceCost = 0
+      else this.spaceCost = Math.round(this.pexpTotal * this.spaceType.code_CTRL01)
     },
     changeSubContract () {
       this.changeQty()

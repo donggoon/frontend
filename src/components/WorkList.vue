@@ -62,7 +62,7 @@ export default {
     }
   },
   created () {
-    this.$http.get('/m/M_WORK_WORK_INFO_LIST_07.do').then(resp => {
+    this.$http.get('/m/getWorkList.do').then(resp => {
       this.items = resp.data.response
       console.log(resp)
     })

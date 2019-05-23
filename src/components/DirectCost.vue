@@ -174,12 +174,13 @@ export default {
         this.spaceWholeCost += parseInt(this.directCosts[i].pri_AMT, '10')
       }
       this.directWholeCost = this.mcstWholeCost + this.pexpWholeCost
-      if (this.directCosts === null) {
-        this.mat_SEQ = 0
-      } else {
-        this.mat_SEQ = this.directCosts.length + 1
+      this.$http.get('/m/getMatSeq.do', {
+        params: { WORK_NO: this.work_NO }
+      }).then(resp => {
+        console.log(resp)
+        this.mat_SEQ = resp.data.response[0]
         console.log(this.mat_SEQ)
-      }
+      })
       this.directCostTotal.push({
         mat_NM: '',
         total_SUM: this.mcstWholeCost + this.pexpWholeCost
