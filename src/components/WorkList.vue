@@ -1,6 +1,9 @@
 <template>
   <v-layout row>
-    <v-flex xs12 sm6 offset-sm3>
+    <template>
+      <v-progress-linear :indeterminate="!isLoaded" :hidden="isLoaded" class="none-padding"></v-progress-linear>
+    </template>
+    <v-flex>
       <v-card>
         <v-list two-line>
           <template v-for="(item, index) in items">
@@ -20,26 +23,22 @@
               ripple
             >
               <v-list-tile-content>
-                <v-list-tile-title>{{ item.work_NM }}</v-list-tile-title>
+                <v-list-tile-title><h5>{{ item.work_NM }}</h5></v-list-tile-title>
                 <v-list-tile-sub-title class="text--primary">공사번호 : {{ item.work_NO }}</v-list-tile-sub-title>
                 <v-list-tile-sub-title>{{ item.work_PRGS_STAT_NM }}</v-list-tile-sub-title>
               </v-list-tile-content>
 
               <v-list-tile-action>
-                <v-list-tile-action-text>{{ item.pchr_EMPN_NM }}</v-list-tile-action-text>
+                <v-list-tile-action-text class="text--primary">{{ item.pchr_EMPN_NM }}</v-list-tile-action-text>
                 <v-icon
                   v-if="item.work_PRGS_STAT_CD !== '4'"
                   color="grey lighten-1"
-                >
-                  star_border
-                </v-icon>
+                >edit</v-icon>
 
                 <v-icon
                   v-else
                   color="yellow darken-2"
-                >
-                  star
-                </v-icon>
+                >edit</v-icon>
               </v-list-tile-action>
             </v-list-tile>
             <v-divider
@@ -58,13 +57,15 @@
 export default {
   data () {
     return {
-      items: []
+      items: [],
+      isLoaded: false
     }
   },
   created () {
-    this.$http.get('/m/getWorkList.do').then(resp => {
+    console.log(this.$path + '/m/getWorkList.do')
+    this.$http.get(this.$path + '/m/getWorkList.do').then(resp => {
       this.items = resp.data.response
-      console.log(resp)
+      this.isLoaded = true
     })
   }
 }

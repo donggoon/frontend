@@ -14,6 +14,7 @@ Vue.config.productionTip = false
 Vue.prototype.$http = axios
 Vue.prototype.$appName = '시설공사'
 Vue.use(Vuetify)
+Vue.prototype.$path = location.host === 'localhost:9090' ? '/corp' : ''
 
 /* eslint-disable no-new */
 new Vue({

@@ -6,7 +6,7 @@
       label="사급유무"
       data-vv-name="subContract"
       type="subContract"
-      class="ml-2 mr-2"
+      class="compact-form none-padding ml-2 mr-2"
       @change="changeSubContract"
     ></v-checkbox>
     <v-select
@@ -20,21 +20,10 @@
       data-vv-name="matType"
       required
       v-on:change="changeType(`${matType}`)"
-      class="ml-2 mr-2"
+      class="none-padding ml-2 mr-2"
     ></v-select>
-    <v-text-field
-      v-model="matQty"
-      v-validate="'required'"
-      :error-messages="errors.collect('matQty')"
-      label="자재명"
-      data-vv-name="matQty"
-      required
-      v-on:change="changeQty()"
-      class="ml-2 mr-2"
-    ></v-text-field>
     <v-autocomplete
       v-model="matInfo"
-      v-validate="'required'"
       :items="matInfos"
       item-value="mat_NO"
       item-text="mat_NM"
@@ -43,10 +32,9 @@
       data-vv-name="matInfo"
       persistent-hint
       return-object
-      v-on:change="changeMatInfo()"
-      class="ml-2 mr-2"
-    >
-    </v-autocomplete>
+      @change="changeMatInfo"
+      class="none-padding ml-2 mr-2"
+    ></v-autocomplete>
     <v-select
       v-model="matInfo"
       v-validate="'required'"
@@ -59,7 +47,7 @@
       required
       readonly
       append-icon
-      class="ml-2 mr-2"
+      class="none-padding ml-2 mr-2"
     ></v-select>
     <v-select
       v-model="matInfo"
@@ -73,7 +61,7 @@
       required
       readonly
       append-icon
-      class="ml-2 mr-2"
+      class="none-padding ml-2 mr-2"
     ></v-select>
     <v-text-field
       v-model="matQty"
@@ -83,7 +71,7 @@
       data-vv-name="matQty"
       required
       v-on:change="changeQty()"
-      class="ml-2 mr-2"
+      class="none-padding ml-2 mr-2"
     ></v-text-field>
     <v-select
       v-model="matInfo"
@@ -97,7 +85,7 @@
       required
       readonly
       append-icon
-      class="ml-2 mr-2"
+      class="none-padding ml-2 mr-2"
     ></v-select>
     <v-text-field
       v-model="mcstTotal"
@@ -107,7 +95,7 @@
       data-vv-name="mcstTotal"
       required
       readonly
-      class="ml-2 mr-2"
+      class="none-padding ml-2 mr-2"
     ></v-text-field>
     <v-select
       v-model="matInfo"
@@ -121,7 +109,7 @@
       required
       readonly
       append-icon
-      class="ml-2 mr-2"
+      class="none-padding ml-2 mr-2"
     ></v-select>
     <v-text-field
       v-model="pexpTotal"
@@ -131,7 +119,7 @@
       data-vv-name="pexpTotal"
       required
       readonly
-      class="ml-2 mr-2"
+      class="none-padding ml-2 mr-2"
     ></v-text-field>
     <v-text-field
       v-model="total"
@@ -141,7 +129,7 @@
       data-vv-name="total"
       required
       readonly
-      class="ml-2 mr-2"
+      class="none-padding ml-2 mr-2"
     ></v-text-field>
     <v-text-field
       v-model="timeCost"
@@ -150,7 +138,7 @@
       label="시간할증금"
       data-vv-name="timeCost"
       readonly
-      class="ml-2 mr-2"
+      class="none-padding ml-2 mr-2"
     ></v-text-field>
     <v-text-field
       v-model="spaceCost"
@@ -159,7 +147,7 @@
       label="공간할증금"
       data-vv-name="spaceCost"
       readonly
-      class="ml-2 mr-2"
+      class="none-padding ml-2 mr-2"
     ></v-text-field>
     <v-select
       v-model="demolType"
@@ -173,7 +161,7 @@
       required
       return-object
       v-on:change="changeDemolType()"
-      class="ml-2 mr-2"
+      class="none-padding ml-2 mr-2"
     ></v-select>
     <v-select
       v-model="timeType"
@@ -187,7 +175,7 @@
       required
       return-object
       v-on:change="changeTimeType()"
-      class="ml-2 mr-2"
+      class="none-padding ml-2 mr-2"
     ></v-select>
     <v-select
       v-model="spaceType"
@@ -201,7 +189,7 @@
       required
       return-object
       v-on:change="changeSpaceType()"
-      class="ml-2 mr-2"
+      class="none-padding ml-2 mr-2"
     ></v-select>
     <v-textarea
       v-model="description"
@@ -210,7 +198,7 @@
       color="deep-purple"
       label="비고"
       rows="1"
-      class="ml-2 mr-2"
+      class="none-padding ml-2 mr-2"
     ></v-textarea>
     <div class="text-xs-center">
       <v-btn
@@ -288,23 +276,23 @@ export default {
     description: null
   }),
   created () {
-    this.$http.get('/m/getWorkType.do').then(resp => {
+    this.$http.get(this.$path + '/m/getWorkType.do').then(resp => {
       this.matTypes = resp.data.response
       this.matTypes.push({ code_CD: '99', code_DESC1: '단가미적용' })
     })
-    this.$http.get('/m/getCtrlInfo.do', {
+    this.$http.get(this.$path + '/m/getCtrlInfo.do', {
       params: { CLS_ID: 'BSP826' }
     }).then(resp => {
       this.demolTypes = resp.data.response
       this.demolType = this.demolTypes[0]
     })
-    this.$http.get('/m/getCtrlInfo.do', {
+    this.$http.get(this.$path + '/m/getCtrlInfo.do', {
       params: { CLS_ID: 'BSP827' }
     }).then(resp => {
       this.timeTypes = resp.data.response
       this.timeType = this.timeTypes[0]
     })
-    this.$http.get('/m/getCtrlInfo.do', {
+    this.$http.get(this.$path + '/m/getCtrlInfo.do', {
       params: { CLS_ID: 'BSP828' }
     }).then(resp => {
       this.spaceTypes = resp.data.response
@@ -322,7 +310,7 @@ export default {
         alert('필수 정보를 입력하세요!')
         return
       }
-      await this.$http.get('/m/setDirectCost.do', {
+      await this.$http.get(this.$path + '/m/setDirectCost.do', {
         params: {
           WORK_NO: this.work_NO,
           MAT_SEQ: this.mat_SEQ,
@@ -358,7 +346,7 @@ export default {
     },
     changeType (type) {
       console.log(type)
-      this.$http.get('/m/getMatInfo.do', {
+      this.$http.get(this.$path + '/m/getMatInfo.do', {
         params: { WRK_TYPE_CD: type }
       }).then(resp => {
         this.matInfos = resp.data.response
@@ -409,6 +397,14 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+.compact-form {
+  transform: scale(0.8);
+  transform-origin: left bottom;
+}
 
+.none-padding {
+  padding-top: 0;
+  padding-bottom: 0;
+}
 </style>

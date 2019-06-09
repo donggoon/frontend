@@ -10,6 +10,11 @@
       disable-initial-sort
       hide-actions
     >
+      <template v-slot:no-data>
+        <template>
+          <v-progress-linear :indeterminate="!isLoaded" :hidden="isLoaded" class="none-padding"></v-progress-linear>
+        </template>
+      </template>
       <template v-slot:item="props">
         <v-flex
           xs12
@@ -19,67 +24,113 @@
         >
           <v-card>
             <v-divider></v-divider>
-            <router-link
-              :to="{
-                name: 'DirectCostUpdate',
-                params: {
-                  work_NO: work_NO,
-                  work_PRGS_STAT_CD: work_PRGS_STAT_CD,
-                  mat_SEQ: props.item.mat_SEQ
-                }
-              }"
-              tag="span"
-            >
-            <v-card-title>
-              <h4>{{ props.item.mat_NM.substr(props.item.mat_NM.indexOf(':') + 1, props.item.mat_NM.indexOf(':') + 15) }}</h4>
+            <v-card-title class="none-padding overflow-hidden">
+              <v-switch
+                v-model="props.item.expanded"
+                :label="(props.item.expanded) ? '닫기' : '열기'"
+                class="mt-0 pr-0 compact-form"
+              ></v-switch>
               <v-spacer></v-spacer>
-              <h4>합계: {{ props.item.total_SUM }}</h4>
+              <router-link
+                :to="{
+                  name: 'DirectCostUpdate',
+                  params: {
+                    work_NO: work_NO,
+                    work_PRGS_STAT_CD: work_PRGS_STAT_CD,
+                    mat_SEQ: props.item.mat_SEQ
+                  }
+                }"
+                tag="span"
+              >
+                <v-list-tile-title><h5>{{ props.item.mat_NM.substr(props.item.mat_NM.indexOf(':') + 1, props.item.mat_NM.indexOf(':') + 18) }}</h5></v-list-tile-title>
+              </router-link>
             </v-card-title>
-            <div class="text-xs-right mr-3">
-              <span>
-                <h4>시간할증금: {{ props.item.tm_PRI_AMT }}</h4>
-              </span>
-            </div>
-            </router-link>
-            <v-switch
-              v-model="props.item.expanded"
-              :label="(props.item.expanded) ? '닫기' : '열기'"
-              class="pl-3 mt-0"
-            ></v-switch>
+            <v-list dense class="none-padding">
+              <router-link
+                :to="{
+                  name: 'DirectCostUpdate',
+                  params: {
+                    work_NO: work_NO,
+                    work_PRGS_STAT_CD: work_PRGS_STAT_CD,
+                    mat_SEQ: props.item.mat_SEQ
+                  }
+                }"
+                tag="span"
+              >
+              <v-list-tile>
+                <v-list-tile-content>합계:</v-list-tile-content>
+                <v-list-tile-content class="align-end">{{ props.item.total_SUM }}</v-list-tile-content>
+              </v-list-tile>
+              <v-list-tile>
+                <v-list-tile-content>시간할증금:</v-list-tile-content>
+                <v-list-tile-content class="align-end">{{ props.item.tm_PRI_AMT }}</v-list-tile-content>
+              </v-list-tile>
+              </router-link>
+            </v-list>
             <v-list v-if="props.item.expanded" dense>
               <v-list-tile>
                 <v-list-tile-content>수량:</v-list-tile-content>
                 <v-list-tile-content class="align-end">{{ props.item.mat_QTY }}</v-list-tile-content>
               </v-list-tile>
               <v-list-tile>
-                <v-list-tile-content>자재비금액:</v-list-tile-content>
+                <v-list-tile-content>자재비단가:</v-list-tile-content>
                 <v-list-tile-content class="align-end">{{ props.item.mcst_PRCE }}</v-list-tile-content>
               </v-list-tile>
               <v-list-tile>
-                <v-list-tile-content>인건비금액:</v-list-tile-content>
+                <v-list-tile-content>인건비단가:</v-list-tile-content>
                 <v-list-tile-content class="align-end">{{ props.item.pexp_PRCE }}</v-list-tile-content>
               </v-list-tile>
               <v-list-tile>
-                <v-list-tile-content>자재비합계:</v-list-tile-content>
+                <v-list-tile-content>자재비금액:</v-list-tile-content>
                 <v-list-tile-content class="align-end">{{ props.item.mcst_AMT }}</v-list-tile-content>
               </v-list-tile>
               <v-list-tile>
-                <v-list-tile-content>인건비합계:</v-list-tile-content>
+                <v-list-tile-content>인건비금액:</v-list-tile-content>
                 <v-list-tile-content class="align-end">{{ props.item.pexp_AMT }}</v-list-tile-content>
+              </v-list-tile>
+              <v-list-tile>
+                <v-list-tile-content>철거비적용:</v-list-tile-content>
+                <v-list-tile-content class="align-end">{{ props.item.dmol_COST_NM }}</v-list-tile-content>
+              </v-list-tile>
+              <v-list-tile>
+                <v-list-tile-content>시간할증적용:</v-list-tile-content>
+                <v-list-tile-content class="align-end">{{ props.item.tm_PRI_NM }}</v-list-tile-content>
+              </v-list-tile>
+              <v-list-tile>
+                <v-list-tile-content>공간할증적용:</v-list-tile-content>
+                <v-list-tile-content class="align-end">{{ props.item.spac_PRI_NM }}</v-list-tile-content>
+              </v-list-tile>
+              <v-list-tile>
+                <v-list-tile-content>공간할증금:</v-list-tile-content>
+                <v-list-tile-content class="align-end">{{ props.item.pri_AMT }}</v-list-tile-content>
               </v-list-tile>
             </v-list>
           </v-card>
         </v-flex>
       </template>
     </v-data-iterator>
-    <div class="text-xs-right mr-3" color="primary">
-      <span class="justify-end">
-        <h4>직접비합계: {{ mcstWholeCost + pexpWholeCost }}</h4>
-      </span>
-      <span class="justify-end">
-        <h4>시간할증금: {{ timeWholeCost }}</h4>
-      </span>
-    </div>
+    <template v-if="isLoaded">
+      <v-flex
+        xs12
+        sm6
+        md4
+        lg3
+      >
+        <v-card dark>
+          <v-divider></v-divider>
+          <v-list dense class="none-padding">
+            <v-list-tile>
+              <v-list-tile-content>직접비합계:</v-list-tile-content>
+              <v-list-tile-content class="align-end">{{ directWholeCost }}</v-list-tile-content>
+            </v-list-tile>
+            <v-list-tile>
+              <v-list-tile-content>시간할증금:</v-list-tile-content>
+              <v-list-tile-content class="align-end">{{ timeWholeCost }}</v-list-tile-content>
+            </v-list-tile>
+          </v-list>
+        </v-card>
+      </v-flex>
+    </template>
     <v-btn
       :to="{
         name: 'DirectCostDetail',
@@ -95,7 +146,7 @@
       icon
       bottom
       right
-      color="red"
+      color="primary"
     >
     <v-icon>add</v-icon>
     </v-btn>
@@ -119,22 +170,10 @@
             pri_WHOLE_AMT: this.spaceWholeCost
           }
         }"
-        color="red"
+        color="primary"
         dark
         class="pl-0 pr-0"
       >간접비현황</v-btn>
-      <v-btn
-        :to="{
-          name: 'DirectCostDetail',
-          params: {
-            work_NO: this.work_NO,
-            work_PRGS_STAT_CD: this.work_PRGS_STAT_CD,
-            mat_SEQ: this.mat_SEQ
-          }
-        }"
-        color="primary"
-        dark
-      >항목추가</v-btn>
     </div>
   </div>
 </template>
@@ -158,34 +197,42 @@ export default {
       spaceWholeCost: 0,
       directWholeCost: 0,
       isFinished: true,
-      alert: true
+      alert: true,
+      isLoaded: false
     }
   },
   created () {
     this.isFinished = false
-    this.$http.get('/m/getDirectCost.do', {
+    this.$http.get(this.$path + '/m/getDirectCost.do', {
       params: { WORK_NO: this.work_NO }
     }).then(resp => {
       this.directCosts = resp.data.response
       for (let i = 0; i < this.directCosts.length; i++) {
-        this.mcstWholeCost += parseInt(this.directCosts[i].mcst_AMT, '10')
-        this.pexpWholeCost += parseInt(this.directCosts[i].pexp_AMT, '10')
-        this.timeWholeCost += parseInt(this.directCosts[i].tm_PRI_AMT, '10')
-        this.spaceWholeCost += parseInt(this.directCosts[i].pri_AMT, '10')
+        this.mcstWholeCost += (this.directCosts[i].mcst_AMT * 10) / 10
+        this.pexpWholeCost += (this.directCosts[i].pexp_AMT * 10) / 10
+        this.timeWholeCost += (this.directCosts[i].tm_PRI_AMT * 10) / 10
+        this.spaceWholeCost += (this.directCosts[i].pri_AMT * 10) / 10
       }
-      this.directWholeCost = this.mcstWholeCost + this.pexpWholeCost
-      this.$http.get('/m/getMatSeq.do', {
+      this.directWholeCost = Math.round(this.mcstWholeCost + this.pexpWholeCost)
+      this.$http.get(this.$path + '/m/getMatSeq.do', {
         params: { WORK_NO: this.work_NO }
       }).then(resp => {
-        console.log(resp)
         this.mat_SEQ = resp.data.response[0]
-        console.log(this.mat_SEQ)
       })
-      this.directCostTotal.push({
-        mat_NM: '',
-        total_SUM: this.mcstWholeCost + this.pexpWholeCost
-      })
+      this.isLoaded = true
     })
   }
 }
 </script>
+
+<style scoped>
+.compact-form {
+  transform: scale(0.75);
+  transform-origin: left bottom;
+}
+
+.none-padding {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+</style>

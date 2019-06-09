@@ -7,6 +7,11 @@
       disable-initial-sort
       hide-actions
     >
+      <template v-slot:no-data>
+        <template>
+          <v-progress-linear :indeterminate="!isLoaded" :hidden="isLoaded" class="none-padding"></v-progress-linear>
+        </template>
+      </template>
       <template v-slot:items="props">
         <td class="text-xs-center">{{ props.item.ocst_NM }}</td>
         <td class="text-xs-right">{{ props.item.appl_AMT }}</td>
@@ -17,28 +22,9 @@
     <v-checkbox
       v-model="etcCost"
       @change="changeEtcCost"
-      class="mb-0 ml-2"
+      class="mb-0 ml-2 compact-form none-padding"
       label="잡재료/공구손료"
     ></v-checkbox>
-    <v-btn
-      :to="{
-        name: 'DirectCostDetail',
-        params: {
-          work_NO: this.work_NO,
-          work_PRGS_STAT_CD: this.work_PRGS_STAT_CD,
-          mat_SEQ: this.mat_SEQ
-        }
-      }"
-      :hidden="isFinished"
-      fixed
-      dark
-      icon
-      top
-      right
-      color="red"
-    >
-    <v-icon>add</v-icon>
-    </v-btn>
     <div class="text-xs-center">
       <v-btn
         :to="{
@@ -51,20 +37,13 @@
         color="primary"
         dark
         class="pl-0 pr-0"
-      >직접비계산</v-btn>
+      >직접비현황</v-btn>
       <v-btn
         color="primary"
         dark
         @click="updateOverheadCost"
         :disabled="isFinished"
       >임시저장</v-btn>
-      <v-btn
-        :hidden="isFinished"
-        color="red"
-        dark
-        @click="updateWorkInfo"
-        :disabled="isFinished"
-      >정산요청</v-btn>
     </div>
   </div>
 </template>
@@ -83,7 +62,7 @@ export default {
           sortable: false,
           value: 'ocst_NM',
           width: '35%',
-          class: 'font-weight-bold'
+          class: 'font-weight-bold text--primary'
         },
         {
           text: '금액',
@@ -91,7 +70,7 @@ export default {
           sortable: false,
           value: 'appl_AMT',
           width: '20%',
-          class: 'font-weight-bold'
+          class: 'font-weight-bold text--primary'
         },
         {
           text: '요율',
@@ -99,7 +78,7 @@ export default {
           sortable: false,
           value: 'appl_RATE',
           width: '10%',
-          class: 'font-weight-bold'
+          class: 'font-weight-bold text--primary'
         },
         {
           text: '적용기준(%)',
@@ -107,7 +86,7 @@ export default {
           sortable: false,
           value: 'appl_NM',
           width: '35%',
-          class: 'font-weight-bold'
+          class: 'font-weight-bold text--primary'
         }
       ],
       etcCost: false,
@@ -117,7 +96,8 @@ export default {
       overheadWholeCost: 0,
       workCost: 0,
       isFinished: true,
-      mat_SEQ: ''
+      mat_SEQ: '',
+      isLoaded: false
     }
   },
   created () {
@@ -125,13 +105,18 @@ export default {
     this.isFinished = this.work_PRGS_STAT_CD !== '4'
     console.log(this.isFinished)
     this.directWholeCost = this.mcst_WHOLE_AMT + this.pexp_WHOLE_AMT
-    this.$http.get('/m/selectOverheadCost.do', {
+    this.$http.get(this.$path + '/m/selectOverheadCost.do', {
       params: { WORK_NO: this.work_NO }
     }).then(resp => {
       this.overheadCosts = resp.data.response
       this.overheadCosts[0].appl_AMT = Math.round(this.directWholeCost * this.overheadCosts[0].appl_RATE / 100) // 공과잡비
       this.overheadCosts[1].appl_AMT = Math.round(this.directWholeCost * this.overheadCosts[1].appl_RATE / 100) // 안전관리비
-      this.overheadCosts[2].appl_AMT = Math.round(this.pexp_WHOLE_AMT * this.overheadCosts[2].appl_RATE / 100) // 산재보험료
+      console.log(this.mcst_WHOLE_AMT)
+      if (this.mcst_WHOLE_AMT > 0) {
+        this.overheadCosts[2].appl_AMT = Math.round(this.pexp_WHOLE_AMT * this.overheadCosts[2].appl_RATE / 100) // 산재보험료
+      } else {
+        this.overheadCosts[2].appl_AMT = Math.round(this.pexp_WHOLE_AMT * this.overheadCosts[2].appl_RATE_EXTRA / 100) // 산재보험료
+      }
       this.overheadCosts[3].appl_AMT = Math.round(this.pexp_WHOLE_AMT * this.overheadCosts[3].appl_RATE / 100) // 고용보험료
       this.overheadCosts[5].appl_AMT = Math.round(this.pri_WHOLE_AMT) // 공간할증금액
       if (this.overheadCosts[0].etc_COST_USE_CD === 'Y') {
@@ -149,21 +134,28 @@ export default {
       for (let i = 0; i < this.overheadCosts.length; i++) {
         this.overheadWholeCost += parseInt(this.overheadCosts[i].appl_AMT, '10')
       }
-      this.workCost = this.directWholeCost + this.overheadWholeCost
+      this.workCost = Math.round(this.directWholeCost + this.overheadWholeCost + this.tm_PRI_WHOLE_AMT)
       this.overheadCosts.push({
-        ocst_NM: '합계',
+        ocst_NM: '간접비 합계',
         appl_AMT: this.overheadWholeCost,
         appl_RATE: null,
         appl_NM: null
       })
+      this.overheadCosts.push({
+        ocst_NM: '총 합계',
+        appl_AMT: this.workCost,
+        appl_RATE: null,
+        appl_NM: null
+      })
       this.changeEtcCost()
+      this.isLoaded = true
     })
   },
   methods: {
     updateOverheadCost () {
       confirm('저장하시겠습니까?')
       for (let i = 0; i < this.overheadCosts.length; i++) {
-        this.$http.get('/m/mergeOverheadCost.do', {
+        this.$http.get(this.$path + '/m/mergeOverheadCost.do', {
           params: {
             WORK_NO: this.work_NO,
             OCST_CD: this.overheadCosts[i].ocst_CD,
@@ -182,15 +174,17 @@ export default {
         this.overheadCosts[7].appl_AMT = 0
       }
       this.overheadWholeCost = 0
-      for (let i = 0; i < this.overheadCosts.length - 1; i++) {
+      for (let i = 0; i < this.overheadCosts.length - 2; i++) {
         this.overheadWholeCost += parseInt(this.overheadCosts[i].appl_AMT, '10')
       }
-      this.workCost = this.directWholeCost + this.overheadWholeCost
+      this.overheadCosts[this.overheadCosts.length - 2].appl_AMT = this.overheadWholeCost
+      this.workCost = Math.round(this.directWholeCost + this.overheadWholeCost + this.tm_PRI_WHOLE_AMT)
+      this.overheadCosts[this.overheadCosts.length - 1].appl_AMT = this.workCost
     },
     async updateWorkInfo () {
       confirm('정산요청 하시겠습니까?')
       for (let i = 0; i < this.overheadCosts.length - 1; i++) {
-        this.$http.get('/m/mergeOverheadCost.do', {
+        this.$http.get(this.$path + '/m/mergeOverheadCost.do', {
           params: {
             WORK_NO: this.work_NO,
             OCST_CD: this.overheadCosts[i].ocst_CD,
@@ -199,7 +193,7 @@ export default {
           }
         })
       }
-      await this.$http.get('/m/updateWorkInfo.do', {
+      await this.$http.get(this.$path + '/m/updateWorkInfo.do', {
         params: {
           WORK_NO: this.work_NO,
           PEXP_WHOLE_AMT: this.pexpWholeCost,
@@ -217,6 +211,14 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+.compact-form {
+  transform: scale(0.8);
+  transform-origin: left top;
+}
 
+.none-padding {
+  padding-top: 0;
+  padding-bottom: 0;
+}
 </style>

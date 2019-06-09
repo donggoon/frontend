@@ -1,5 +1,8 @@
 <template>
   <form>
+    <template>
+      <v-progress-linear :indeterminate="!isLoaded" :hidden="isLoaded" class="none-padding"></v-progress-linear>
+    </template>
     <v-checkbox
       v-model="subContract"
       value="Y"
@@ -7,7 +10,7 @@
       data-vv-name="subContract"
       type="subContract"
       :readonly="isFinished"
-      class="ml-2 mr-2"
+      class="compact-form none-padding ml-2 mr-2"
       @change="changeSubContract"
     ></v-checkbox>
     <v-select
@@ -22,7 +25,7 @@
       required
       @change="changeType(`${matType}`)"
       :readonly="isFinished"
-      class="ml-2 mr-2"
+      class="none-padding ml-2 mr-2"
     ></v-select>
     <v-autocomplete
       v-model="matInfo"
@@ -36,7 +39,7 @@
       persistent-hint
       return-object
       @change="changeMatInfo"
-      class="ml-2 mr-2"
+      class="none-padding ml-2 mr-2"
     >
     </v-autocomplete>
     <v-select
@@ -51,7 +54,7 @@
       required
       readonly
       append-icon
-      class="ml-2 mr-2"
+      class="none-padding ml-2 mr-2"
     ></v-select>
     <v-select
       v-model="matInfo"
@@ -65,7 +68,7 @@
       required
       readonly
       append-icon
-      class="ml-2 mr-2"
+      class="none-padding ml-2 mr-2"
     ></v-select>
     <v-text-field
       v-model="matQty"
@@ -76,7 +79,7 @@
       required
       @change="changeQty"
       :readonly="isFinished"
-      class="ml-2 mr-2"
+      class="none-padding ml-2 mr-2"
     ></v-text-field>
     <v-select
       v-model="matInfo"
@@ -90,7 +93,7 @@
       required
       readonly
       append-icon
-      class="ml-2 mr-2"
+      class="none-padding ml-2 mr-2"
     ></v-select>
     <v-text-field
       v-model="mcstTotal"
@@ -100,7 +103,7 @@
       data-vv-name="mcstTotal"
       required
       readonly
-      class="ml-2 mr-2"
+      class="none-padding ml-2 mr-2"
     ></v-text-field>
     <v-select
       v-model="matInfo"
@@ -114,7 +117,7 @@
       required
       readonly
       append-icon
-      class="ml-2 mr-2"
+      class="none-padding ml-2 mr-2"
     ></v-select>
     <v-text-field
       v-model="pexpTotal"
@@ -124,7 +127,7 @@
       data-vv-name="pexpTotal"
       required
       readonly
-      class="ml-2 mr-2"
+      class="none-padding ml-2 mr-2"
     ></v-text-field>
     <v-text-field
       v-model="timeCost"
@@ -133,7 +136,7 @@
       label="시간할증금"
       data-vv-name="timeCost"
       readonly
-      class="ml-2 mr-2"
+      class="none-padding ml-2 mr-2"
     ></v-text-field>
     <v-text-field
       v-model="total"
@@ -143,7 +146,7 @@
       data-vv-name="total"
       required
       readonly
-      class="ml-2 mr-2"
+      class="none-padding ml-2 mr-2"
     ></v-text-field>
     <v-text-field
       v-model="spaceCost"
@@ -152,7 +155,7 @@
       label="공간할증금"
       data-vv-name="spaceCost"
       readonly
-      class="ml-2 mr-2"
+      class="none-padding ml-2 mr-2"
     ></v-text-field>
     <v-select
       v-model="demolType"
@@ -167,7 +170,7 @@
       return-object
       @change="changeDemolType()"
       :readonly="isFinished"
-      class="ml-2 mr-2"
+      class="none-padding ml-2 mr-2"
     ></v-select>
     <v-select
       v-model="timeType"
@@ -182,7 +185,7 @@
       return-object
       @change="changeTimeType()"
       :readonly="isFinished"
-      class="ml-2 mr-2"
+      class="none-padding ml-2 mr-2"
     ></v-select>
     <v-select
       v-model="spaceType"
@@ -197,7 +200,7 @@
       return-object
       @change="changeSpaceType()"
       :readonly="isFinished"
-      class="ml-2 mr-2"
+      class="none-padding ml-2 mr-2"
     ></v-select>
     <v-textarea
       v-model="description"
@@ -207,7 +210,7 @@
       label="비고"
       rows="1"
       :readonly="isFinished"
-      class="ml-2 mr-2"
+      class="none-padding ml-2 mr-2"
     ></v-textarea>
 
     <div class="text-xs-center">
@@ -295,22 +298,23 @@ export default {
     timeTypes: [],
     spaceTypes: [],
     matQty: null,
-    description: ''
+    description: '',
+    isLoaded: false
   }),
   created () {
     this.isFinished = this.work_PRGS_STAT_CD !== '4'
-    this.$http.get('/m/getDirectCostDetail.do', {
+    this.$http.get(this.$path + '/m/getDirectCostDetail.do', {
       params: { WORK_NO: this.work_NO, MAT_SEQ: this.mat_SEQ }
     }).then(resp => {
       this.directCostDetails = resp.data.response
       this.directCostDetail = this.directCostDetails[0]
 
-      this.$http.get('/m/getWorkType.do').then(resp => {
+      this.$http.get(this.$path + '/m/getWorkType.do').then(resp => {
         this.matTypes = resp.data.response
         this.matTypes.push({ code_CD: '99', code_DESC1: '단가미적용' })
       })
 
-      this.$http.get('/m/getCtrlInfo.do', {
+      this.$http.get(this.$path + '/m/getCtrlInfo.do', {
         params: { CLS_ID: 'BSP826' }
       }).then(resp => {
         this.demolTypes = resp.data.response
@@ -320,14 +324,14 @@ export default {
         this.pexpInit = this.matInfo.pexp_PRCE / this.demolType.code_CTRL01
       })
 
-      this.$http.get('/m/getCtrlInfo.do', {
+      this.$http.get(this.$path + '/m/getCtrlInfo.do', {
         params: { CLS_ID: 'BSP827' }
       }).then(resp => {
         this.timeTypes = resp.data.response
         this.timeType = this.timeTypes[parseInt(this.directCostDetail.tm_PRI_CD, '10')]
       })
 
-      this.$http.get('/m/getCtrlInfo.do', {
+      this.$http.get(this.$path + '/m/getCtrlInfo.do', {
         params: { CLS_ID: 'BSP828' }
       }).then(resp => {
         this.spaceTypes = resp.data.response
@@ -363,7 +367,7 @@ export default {
         this.description = this.directCostDetail.rmk_DESC
         this.changeQty()
       } else {
-        this.$http.get('/m/getMatInfo.do', {
+        this.$http.get(this.$path + '/m/getMatInfo.do', {
           params: { WRK_TYPE_CD: this.directCostDetail.wrk_TYPE_CD, MAT_NO: this.directCostDetail.mat_NO }
         }).then(resp => {
           this.matInfos = resp.data.response
@@ -375,6 +379,7 @@ export default {
           this.changeMatInfo()
         })
       }
+      this.isLoaded = true
     })
   },
   mounted () {
@@ -388,7 +393,7 @@ export default {
         alert('필수 정보를 입력하세요!')
         return
       }
-      await this.$http.get('/m/updateDirectCost.do', {
+      await this.$http.get(this.$path + '/m/updateDirectCost.do', {
         params: {
           WORK_NO: this.work_NO,
           MAT_SEQ: this.mat_SEQ,
@@ -424,7 +429,7 @@ export default {
     },
     async deleteDirectCost () {
       if (!confirm('정말 삭제하시겠습니까?')) return
-      await this.$http.get('/m/deleteDirectCost.do', {
+      await this.$http.get(this.$path + '/m/deleteDirectCost.do', {
         params: {
           WORK_NO: this.work_NO,
           MAT_SEQ: this.mat_SEQ
@@ -440,7 +445,7 @@ export default {
       })
     },
     changeType (type) {
-      this.$http.get('/m/getMatInfo.do', {
+      this.$http.get(this.$path + '/m/getMatInfo.do', {
         params: { WRK_TYPE_CD: type }
       }).then(resp => {
         this.matInfos = resp.data.response
@@ -460,9 +465,9 @@ export default {
       if (this.matQty !== null) {
         this.changeQty()
       }
-      this.changeDemolType()
-      this.changeTimeType()
-      this.changeSpaceType()
+      if (this.demolType !== null) this.changeDemolType()
+      if (this.timeType !== null) this.changeTimeType()
+      if (this.spaceType !== null) this.changeSpaceType()
     },
     changeQty () {
       this.pexpTotal = Math.round(this.matInfo.pexp_PRCE * this.matQty * 10) / 10
@@ -495,6 +500,14 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+.compact-form {
+  transform: scale(0.8);
+  transform-origin: left bottom;
+}
 
+.none-padding {
+  padding-top: 0;
+  padding-bottom: 0;
+}
 </style>
