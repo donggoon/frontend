@@ -20,14 +20,6 @@ export default new Router({
       }
     },
     {
-      path: '/worklist',
-      name: 'WorkList',
-      component: WorkList,
-      meta: {
-        title: '정산서 현황'
-      }
-    },
-    {
       path: '/directcost',
       name: 'DirectCost',
       component: DirectCost,

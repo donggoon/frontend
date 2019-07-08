@@ -212,29 +212,39 @@ export default {
     }
   },
   created () {
-    // get props to variables
-    this.work_NO = this.p_WORK_NO
-    this.work_PRGS_STAT_CD = this.p_WORK_PRGS_STAT_CD
+    this.init()
+  },
+  activated () {
+    if (typeof this.p_WORK_NO !== 'undefined' && this.p_WORK_NO !== this.work_NO) {
+      this.init()
+    }
+  },
+  methods: {
+    init () {
+      // get props to variables
+      this.work_NO = this.p_WORK_NO
+      this.work_PRGS_STAT_CD = this.p_WORK_PRGS_STAT_CD
 
-    this.isFinished = false
-    this.$http.get(this.$path + '/m/getDirectCost.do', {
-      params: { WORK_NO: this.work_NO }
-    }).then(resp => {
-      this.directCosts = resp.data.response
-      for (let i = 0; i < this.directCosts.length; i++) {
-        this.mcstWholeCost += (this.directCosts[i].mcst_AMT * 10) / 10
-        this.pexpWholeCost += (this.directCosts[i].pexp_AMT * 10) / 10
-        this.timeWholeCost += (this.directCosts[i].tm_PRI_AMT * 10) / 10
-        this.spaceWholeCost += (this.directCosts[i].pri_AMT * 10) / 10
-      }
-      this.directWholeCost = Math.round(this.mcstWholeCost + this.pexpWholeCost)
-      this.$http.get(this.$path + '/m/getMatSeq.do', {
+      this.isFinished = false
+      this.$http.get(this.$path + '/m/getDirectCost.do', {
         params: { WORK_NO: this.work_NO }
       }).then(resp => {
-        this.mat_SEQ = resp.data.response[0]
+        this.directCosts = resp.data.response
+        for (let i = 0; i < this.directCosts.length; i++) {
+          this.mcstWholeCost += (this.directCosts[i].mcst_AMT * 10) / 10
+          this.pexpWholeCost += (this.directCosts[i].pexp_AMT * 10) / 10
+          this.timeWholeCost += (this.directCosts[i].tm_PRI_AMT * 10) / 10
+          this.spaceWholeCost += (this.directCosts[i].pri_AMT * 10) / 10
+        }
+        this.directWholeCost = Math.round(this.mcstWholeCost + this.pexpWholeCost)
+        this.$http.get(this.$path + '/m/getMatSeq.do', {
+          params: { WORK_NO: this.work_NO }
+        }).then(resp => {
+          this.mat_SEQ = resp.data.response[0]
+        })
+        this.isLoaded = true
       })
-      this.isLoaded = true
-    })
+    }
   }
 }
 </script>
