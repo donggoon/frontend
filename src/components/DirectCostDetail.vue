@@ -1,3 +1,10 @@
+<!--
+  - 1. 서브메뉴명 : 직접비 현황 추가
+  - 2. 프로그램ID : DirectCostDetail.vue
+  - 3. 프로그램명 : 비용정산
+  - 4. 작성자 : 김동건
+  - 5. 작성일 : 2019.07.08
+  -->
 <template>
   <form>
     <v-checkbox
@@ -374,8 +381,11 @@ export default {
     },
     changeDemolType () {
       if (this.matQty === null) return
-      if (this.subContract === null) this.matInfo.mcst_PRCE = Math.round(this.mcstInit * this.demolType.code_CTRL01 * 10) / 10
-      else this.matInfo.mcst_PRCE = 0
+      if (this.subContract === null) {
+        if (this.demolType.code_CD !== '0') {
+          this.matInfo.mcst_PRCE = 0
+        } else this.matInfo.mcst_PRCE = Math.round(this.mcstInit * this.demolType.code_CTRL01 * 10) / 10
+      } else this.matInfo.mcst_PRCE = 0
       this.matInfo.pexp_PRCE = Math.round(this.pexpInit * this.demolType.code_CTRL01 * 10) / 10
       this.pexpTotal = Math.round(this.matInfo.pexp_PRCE * this.matQty * 10) / 10
       if (this.subContract) this.mcstTotal = 0

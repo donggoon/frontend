@@ -49,7 +49,11 @@
       </v-list>
     </v-navigation-drawer>
     <v-content>
-      <router-view/>
+      <transition>
+        <keep-alive :include="['DirectCost']">
+          <router-view/>
+        </keep-alive>
+      </transition>
     </v-content>
   </v-app>
 </template>

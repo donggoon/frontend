@@ -1,3 +1,10 @@
+<!--
+  - 1. 서브메뉴명 : 정산서 현황
+  - 2. 프로그램ID : WorkList.vue
+  - 3. 프로그램명 : 비용정산
+  - 4. 작성자 : 김동건
+  - 5. 작성일 : 2019.07.08
+  -->
 <template>
   <v-layout row>
     <template>
@@ -11,8 +18,8 @@
               :to="{
                 name: 'DirectCost',
                 params: {
-                  work_NO: item.work_NO,
-                  work_PRGS_STAT_CD: item.work_PRGS_STAT_CD
+                  p_WORK_NO: item.work_NO,
+                  p_WORK_PRGS_STAT_CD: item.work_PRGS_STAT_CD
                   }
                 }"
               v-bind:key="item.work_NO"
@@ -55,6 +62,7 @@
 
 <script>
 export default {
+  name: 'WorkList',
   data () {
     return {
       items: [],
@@ -62,11 +70,15 @@ export default {
     }
   },
   created () {
-    console.log(this.$path + '/m/getWorkList.do')
     this.$http.get(this.$path + '/m/getWorkList.do').then(resp => {
       this.items = resp.data.response
       this.isLoaded = true
     })
+  },
+  activated () {
+    if (this.isLoaded) {
+      console.log(this.items[0].work_NO)
+    }
   }
 }
 </script>

@@ -1,3 +1,10 @@
+<!--
+  - 1. 서브메뉴명 : 직접비 현황
+  - 2. 프로그램ID : DirectCost.vue
+  - 3. 프로그램명 : 비용정산
+  - 4. 작성자 : 김동건
+  - 5. 작성일 : 2019.07.08
+  -->
 <template>
   <div>
     <v-data-iterator
@@ -180,7 +187,8 @@
 
 <script>
 export default {
-  props: [ 'work_NO', 'work_PRGS_STAT_CD' ],
+  name: 'DirectCost',
+  props: [ 'p_WORK_NO', 'p_WORK_PRGS_STAT_CD' ],
   data () {
     return {
       expand: false,
@@ -198,10 +206,16 @@ export default {
       directWholeCost: 0,
       isFinished: true,
       alert: true,
-      isLoaded: false
+      isLoaded: false,
+      work_NO: '',
+      work_PRGS_STAT_CD: ''
     }
   },
   created () {
+    // get props to variables
+    this.work_NO = this.p_WORK_NO
+    this.work_PRGS_STAT_CD = this.p_WORK_PRGS_STAT_CD
+
     this.isFinished = false
     this.$http.get(this.$path + '/m/getDirectCost.do', {
       params: { WORK_NO: this.work_NO }

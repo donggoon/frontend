@@ -9,6 +9,7 @@ import OverheadCost from '@/components/OverheadCost'
 Vue.use(Router)
 
 export default new Router({
+  mode: 'history',
   routes: [
     {
       path: '/',
@@ -63,5 +64,8 @@ export default new Router({
         title: '간접비 현황'
       }
     }
-  ]
+  ],
+  scrollBehavior (to, from, savedPosition) {
+    return { x: 0, y: 0 }
+  }
 })

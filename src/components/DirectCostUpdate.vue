@@ -1,3 +1,10 @@
+<!--
+  - 1. 서브메뉴명 : 직접비 현황 수정
+  - 2. 프로그램ID : DirectCostUpdate.vue
+  - 3. 프로그램명 : 비용정산
+  - 4. 작성자 : 김동건
+  - 5. 작성일 : 2019.07.08
+  -->
 <template>
   <form>
     <template>
@@ -308,6 +315,9 @@ export default {
     }).then(resp => {
       this.directCostDetails = resp.data.response
       this.directCostDetail = this.directCostDetails[0]
+      console.log(this.directCostDetail)
+      this.subContract = this.directCostDetail.carr_USE_CD
+      console.log(this.subContract)
 
       this.$http.get(this.$path + '/m/getWorkType.do').then(resp => {
         this.matTypes = resp.data.response
@@ -319,7 +329,6 @@ export default {
       }).then(resp => {
         this.demolTypes = resp.data.response
         this.demolType = this.demolTypes[parseInt(this.directCostDetail.dmol_COST_CD, '10')]
-        console.log(this.demolType.code_CTRL01)
         this.mcstInit = this.matInfo.mcst_PRCE / this.demolType.code_CTRL01
         this.pexpInit = this.matInfo.pexp_PRCE / this.demolType.code_CTRL01
       })
@@ -477,8 +486,11 @@ export default {
     },
     changeDemolType () {
       if (this.matQty === null) return
-      if (this.subContract === null) this.matInfo.mcst_PRCE = Math.round(this.mcstInit * this.demolType.code_CTRL01 * 10) / 10
-      else this.matInfo.mcst_PRCE = 0
+      if (this.subContract === null) {
+        if (this.demolType.code_CD !== '0') {
+          this.matInfo.mcst_PRCE = 0
+        } else this.matInfo.mcst_PRCE = Math.round(this.mcstInit * this.demolType.code_CTRL01 * 10) / 10
+      } else this.matInfo.mcst_PRCE = 0
       this.matInfo.pexp_PRCE = Math.round(this.pexpInit * this.demolType.code_CTRL01 * 10) / 10
       this.pexpTotal = Math.round(this.matInfo.pexp_PRCE * this.matQty * 10) / 10
       if (this.subContract) this.mcstTotal = 0
