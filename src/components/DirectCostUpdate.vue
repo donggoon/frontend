@@ -254,7 +254,7 @@ Vue.use(VeeValidate)
 
 export default {
   name: 'DirectCostUpdate',
-  props: ['work_NO', 'work_PRGS_STAT_CD', 'mat_SEQ'],
+  props: ['p_WORK_NO', 'p_WORK_PRGS_STAT_CD', 'p_MAT_SEQ'],
   $_veeValidate: {
     validator: 'new'
   },
@@ -306,18 +306,24 @@ export default {
     spaceTypes: [],
     matQty: null,
     description: '',
-    isLoaded: false
+    isLoaded: false,
+    work_NO: '',
+    work_PRGS_STAT_CD: '',
+    mat_SEQ: ''
   }),
   created () {
+    // get props to variables
+    this.work_NO = this.p_WORK_NO
+    this.work_PRGS_STAT_CD = this.p_WORK_PRGS_STAT_CD
+    this.mat_SEQ = this.p_MAT_SEQ
+
     this.isFinished = this.work_PRGS_STAT_CD !== '4'
     this.$http.get(this.$path + '/m/getDirectCostDetail.do', {
       params: { WORK_NO: this.work_NO, MAT_SEQ: this.mat_SEQ }
     }).then(resp => {
       this.directCostDetails = resp.data.response
       this.directCostDetail = this.directCostDetails[0]
-      console.log(this.directCostDetail)
       this.subContract = this.directCostDetail.carr_USE_CD
-      console.log(this.subContract)
 
       this.$http.get(this.$path + '/m/getWorkType.do').then(resp => {
         this.matTypes = resp.data.response
@@ -431,8 +437,8 @@ export default {
       this.$router.push({
         name: 'DirectCost',
         params: {
-          work_NO: this.work_NO,
-          work_PRGS_STAT_CD: this.work_PRGS_STAT_CD
+          p_WORK_NO: this.work_NO,
+          p_WORK_PRGS_STAT_CD: this.work_PRGS_STAT_CD
         }
       })
     },
@@ -448,8 +454,8 @@ export default {
       this.$router.push({
         name: 'DirectCost',
         params: {
-          work_NO: this.work_NO,
-          work_PRGS_STAT_CD: this.work_PRGS_STAT_CD
+          p_WORK_NO: this.work_NO,
+          p_WORK_PRGS_STAT_CD: this.work_PRGS_STAT_CD
         }
       })
     },

@@ -58,7 +58,7 @@
 <script>
 export default {
   name: 'OverheadCost',
-  props: [ 'work_NO', 'work_PRGS_STAT_CD', 'mcst_WHOLE_AMT', 'pexp_WHOLE_AMT', 'tm_PRI_WHOLE_AMT', 'pri_WHOLE_AMT' ],
+  props: [ 'p_WORK_NO', 'p_WORK_PRGS_STAT_CD', 'p_MCST_WHOLE_AMT', 'p_PEXP_WHOLE_AMT', 'p_TM_PRI_WHOLE_AMT', 'p_PRI_WHOLE_AMT' ],
   data () {
     return {
       expand: false,
@@ -104,13 +104,25 @@ export default {
       workCost: 0,
       isFinished: true,
       mat_SEQ: '',
-      isLoaded: false
+      isLoaded: false,
+      work_NO: '',
+      work_PRGS_STAT_CD: '',
+      mcst_WHOLE_AMT: '',
+      pexp_WHOLE_AMT: '',
+      tm_PRI_WHOLE_AMT: '',
+      pri_WHOLE_AMT: ''
     }
   },
   created () {
-    console.log(this.work_PRGS_STAT_CD)
+    // get props to variables
+    this.work_NO = this.p_WORK_NO
+    this.work_PRGS_STAT_CD = this.p_WORK_PRGS_STAT_CD
+    this.mcst_WHOLE_AMT = this.p_MCST_WHOLE_AMT
+    this.pexp_WHOLE_AMT = this.p_PEXP_WHOLE_AMT
+    this.tm_PRI_WHOLE_AMT = this.p_TM_PRI_WHOLE_AMT
+    this.pri_WHOLE_AMT = this.p_PRI_WHOLE_AMT
+
     this.isFinished = this.work_PRGS_STAT_CD !== '4'
-    console.log(this.isFinished)
     this.directWholeCost = this.mcst_WHOLE_AMT + this.pexp_WHOLE_AMT
     this.$http.get(this.$path + '/m/selectOverheadCost.do', {
       params: { WORK_NO: this.work_NO }
@@ -118,7 +130,6 @@ export default {
       this.overheadCosts = resp.data.response
       this.overheadCosts[0].appl_AMT = Math.round(this.directWholeCost * this.overheadCosts[0].appl_RATE / 100) // 공과잡비
       this.overheadCosts[1].appl_AMT = Math.round(this.directWholeCost * this.overheadCosts[1].appl_RATE / 100) // 안전관리비
-      console.log(this.mcst_WHOLE_AMT)
       if (this.mcst_WHOLE_AMT > 0) {
         this.overheadCosts[2].appl_AMT = Math.round(this.pexp_WHOLE_AMT * this.overheadCosts[2].appl_RATE / 100) // 산재보험료
       } else {

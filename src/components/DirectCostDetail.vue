@@ -216,8 +216,8 @@
         :to="{
           name: 'DirectCost',
           params: {
-            work_NO: this.work_NO,
-            work_PRGS_STAT_CD: this.work_PRGS_STAT_CD
+            p_WORK_NO: this.work_NO,
+            p_WORK_PRGS_STAT_CD: this.work_PRGS_STAT_CD
           }
         }"
         color="primary">돌아가기</v-btn>
@@ -233,7 +233,7 @@ Vue.use(VeeValidate)
 
 export default {
   name: 'DirectCostDetail',
-  props: ['work_NO', 'work_PRGS_STAT_CD', 'mat_SEQ'],
+  props: ['p_WORK_NO', 'p_WORK_PRGS_STAT_CD', 'p_MAT_SEQ'],
   $_veeValidate: {
     validator: 'new'
   },
@@ -280,9 +280,17 @@ export default {
     demolTypes: [],
     timeTypes: [],
     spaceTypes: [],
-    description: null
+    description: null,
+    work_NO: '',
+    work_PRGS_STAT_CD: '',
+    mat_SEQ: ''
   }),
   created () {
+    // get props to variables
+    this.work_NO = this.p_WORK_NO
+    this.work_PRGS_STAT_CD = this.p_WORK_PRGS_STAT_CD
+    this.mat_SEQ = this.p_MAT_SEQ
+
     this.$http.get(this.$path + '/m/getWorkType.do').then(resp => {
       this.matTypes = resp.data.response
       this.matTypes.push({ code_CD: '99', code_DESC1: '단가미적용' })

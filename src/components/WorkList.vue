@@ -74,11 +74,6 @@ export default {
       this.items = resp.data.response
       this.isLoaded = true
     })
-  },
-  activated () {
-    if (this.isLoaded) {
-      console.log(this.items[0].work_NO)
-    }
   }
 }
 </script>

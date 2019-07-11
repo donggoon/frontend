@@ -57,9 +57,9 @@
                 :to="{
                   name: 'DirectCostUpdate',
                   params: {
-                    work_NO: work_NO,
-                    work_PRGS_STAT_CD: work_PRGS_STAT_CD,
-                    mat_SEQ: props.item.mat_SEQ
+                    p_WORK_NO: work_NO,
+                    p_WORK_PRGS_STAT_CD: work_PRGS_STAT_CD,
+                    p_MAT_SEQ: props.item.mat_SEQ
                   }
                 }"
                 tag="span"
@@ -125,7 +125,7 @@
       >
         <v-card dark>
           <v-divider></v-divider>
-          <v-list dense class="none-padding">
+          <v-list dense class="none-padding" :hidden="!isSaved">
             <v-list-tile>
               <v-list-tile-content>직접비합계:</v-list-tile-content>
               <v-list-tile-content class="align-end">{{ directWholeCost }}</v-list-tile-content>
@@ -147,7 +147,7 @@
           mat_SEQ: this.mat_SEQ
         }
       }"
-      :hidden="isFinished"
+      :disabled="isFinished"
       fixed
       dark
       icon
@@ -208,7 +208,8 @@ export default {
       alert: true,
       isLoaded: false,
       work_NO: '',
-      work_PRGS_STAT_CD: ''
+      work_PRGS_STAT_CD: '',
+      isSaved: false
     }
   },
   created () {
@@ -218,6 +219,9 @@ export default {
     if (typeof this.p_WORK_NO !== 'undefined' && this.p_WORK_NO !== this.work_NO) {
       this.init()
     }
+    if (typeof this.p_WORK_NO !== 'undefined' && typeof this.p_WORK_PRGS_STAT_CD !== 'undefined') {
+      this.init()
+    }
   },
   methods: {
     init () {
@@ -225,7 +229,8 @@ export default {
       this.work_NO = this.p_WORK_NO
       this.work_PRGS_STAT_CD = this.p_WORK_PRGS_STAT_CD
 
-      this.isFinished = false
+      this.isFinished = this.work_PRGS_STAT_CD !== '4'
+
       this.$http.get(this.$path + '/m/getDirectCost.do', {
         params: { WORK_NO: this.work_NO }
       }).then(resp => {
@@ -241,6 +246,8 @@ export default {
           params: { WORK_NO: this.work_NO }
         }).then(resp => {
           this.mat_SEQ = resp.data.response[0]
+          if (this.mat_SEQ > 1) this.isSaved = true
+          else this.isSaved = false
         })
         this.isLoaded = true
       })
