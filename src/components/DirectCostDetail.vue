@@ -354,19 +354,17 @@ export default {
       this.$router.push({
         name: 'DirectCost',
         params: {
-          work_NO: this.work_NO,
-          work_PRGS_STAT_CD: this.work_PRGS_STAT_CD
+          p_WORK_NO: this.work_NO,
+          p_WORK_PRGS_STAT_CD: this.work_PRGS_STAT_CD,
+          isChanged: true
         }
       })
     },
     changeType (type) {
-      console.log(type)
       this.$http.get(this.$path + '/m/getMatInfo.do', {
         params: { WRK_TYPE_CD: type }
       }).then(resp => {
         this.matInfos = resp.data.response
-        console.log(resp)
-        console.log(this.matInfos)
       })
     },
     changeMatInfo () {
@@ -377,15 +375,17 @@ export default {
       if (this.matQty !== null) {
         this.changeQty()
       }
-      this.changeDemolType()
-      this.changeTimeType()
-      this.changeSpaceType()
+      if (this.demolType !== null) this.changeDemolType()
+      if (this.timeType !== null) this.changeTimeType()
+      if (this.spaceType !== null) this.changeSpaceType()
     },
     changeQty () {
       this.pexpTotal = Math.round(this.matInfo.pexp_PRCE * this.matQty * 10) / 10
       if (this.subContract) this.mcstTotal = 0
       else this.mcstTotal = Math.round(this.matInfo.mcst_PRCE * this.matQty * 10) / 10
       this.total = Math.round((this.pexpTotal + this.mcstTotal) * 10) / 10
+      this.changeTimeType()
+      this.changeSpaceType()
     },
     changeDemolType () {
       if (this.matQty === null) return
@@ -399,6 +399,8 @@ export default {
       if (this.subContract) this.mcstTotal = 0
       else this.mcstTotal = Math.round(this.matInfo.mcst_PRCE * this.matQty * 10) / 10
       this.total = Math.round((this.pexpTotal + this.mcstTotal) * 10) / 10
+      this.changeTimeType()
+      this.changeSpaceType()
     },
     changeTimeType () {
       if (this.timeType === '00') this.timeCost = 0

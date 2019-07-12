@@ -42,9 +42,9 @@
                 :to="{
                   name: 'DirectCostUpdate',
                   params: {
-                    work_NO: work_NO,
-                    work_PRGS_STAT_CD: work_PRGS_STAT_CD,
-                    mat_SEQ: props.item.mat_SEQ
+                    p_WORK_NO: work_NO,
+                    p_WORK_PRGS_STAT_CD: work_PRGS_STAT_CD,
+                    p_MAT_SEQ: props.item.mat_SEQ
                   }
                 }"
                 tag="span"
@@ -142,9 +142,9 @@
       :to="{
         name: 'DirectCostDetail',
         params: {
-          work_NO: this.work_NO,
-          work_PRGS_STAT_CD: this.work_PRGS_STAT_CD,
-          mat_SEQ: this.mat_SEQ
+          p_WORK_NO: this.work_NO,
+          p_WORK_PRGS_STAT_CD: this.work_PRGS_STAT_CD,
+          p_MAT_SEQ: this.mat_SEQ
         }
       }"
       :disabled="isFinished"
@@ -169,12 +169,12 @@
         :to="{
           name: 'OverheadCost',
           params: {
-            work_NO: this.work_NO,
-            work_PRGS_STAT_CD: this.work_PRGS_STAT_CD,
-            pexp_WHOLE_AMT: this.pexpWholeCost,
-            mcst_WHOLE_AMT: this.mcstWholeCost,
-            tm_PRI_WHOLE_AMT: this.timeWholeCost,
-            pri_WHOLE_AMT: this.spaceWholeCost
+            p_WORK_NO: this.work_NO,
+            p_WORK_PRGS_STAT_CD: this.work_PRGS_STAT_CD,
+            p_PEXP_WHOLE_AMT: this.pexpWholeCost,
+            p_MCST_WHOLE_AMT: this.mcstWholeCost,
+            p_TM_PRI_WHOLE_AMT: this.timeWholeCost,
+            p_PRI_WHOLE_AMT: this.spaceWholeCost
           }
         }"
         color="primary"
@@ -188,7 +188,7 @@
 <script>
 export default {
   name: 'DirectCost',
-  props: [ 'p_WORK_NO', 'p_WORK_PRGS_STAT_CD' ],
+  props: [ 'p_WORK_NO', 'p_WORK_PRGS_STAT_CD', 'isChanged' ],
   data () {
     return {
       expand: false,
@@ -216,10 +216,7 @@ export default {
     this.init()
   },
   activated () {
-    if (typeof this.p_WORK_NO !== 'undefined' && this.p_WORK_NO !== this.work_NO) {
-      this.init()
-    }
-    if (typeof this.p_WORK_NO !== 'undefined' && typeof this.p_WORK_PRGS_STAT_CD !== 'undefined') {
+    if (this.isChanged) {
       this.init()
     }
   },
