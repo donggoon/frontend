@@ -14,23 +14,14 @@
       <v-card>
         <v-list two-line>
           <template v-for="(item, index) in items">
-            <router-link
-              :to="{
-                name: 'DirectCost',
-                params: {
-                  p_WORK_NO: item.work_NO,
-                  p_WORK_PRGS_STAT_CD: item.work_PRGS_STAT_CD
-                  }
-                }"
-              v-bind:key="item.work_NO"
-              tag="span">
             <v-list-tile
               :key="item.title"
               avatar
               ripple
+              @click="onClickWorkList(item)"
             >
               <v-list-tile-content>
-                <v-list-tile-title><h5>{{ item.work_NM }}</h5></v-list-tile-title>
+                <v-list-tile-title class="font-weight-medium">{{ item.work_NM }}</v-list-tile-title>
                 <v-list-tile-sub-title class="text--primary">공사번호 : {{ item.work_NO }}</v-list-tile-sub-title>
                 <v-list-tile-sub-title>{{ item.work_PRGS_STAT_NM }}</v-list-tile-sub-title>
               </v-list-tile-content>
@@ -52,7 +43,6 @@
               v-if="index + 1 < items.length"
               :key="index"
             ></v-divider>
-            </router-link>
           </template>
         </v-list>
       </v-card>
@@ -74,6 +64,18 @@ export default {
       this.items = resp.data.response
       this.isLoaded = true
     })
+  },
+  methods: {
+    onClickWorkList (item) {
+      this.$router.push({
+        name: 'DirectCost',
+        params: {
+          p_WORK_NO: item.work_NO,
+          p_WORK_PRGS_STAT_CD: item.work_PRGS_STAT_CD,
+          isChanged: true
+        }
+      })
+    }
   }
 }
 </script>

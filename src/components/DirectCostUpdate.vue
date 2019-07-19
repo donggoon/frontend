@@ -52,7 +52,7 @@
     <v-select
       v-model="matInfo"
       v-validate="'required'"
-      :items="matInfos"
+      :items="directCostDetails"
       item-value="spec_DESC"
       item-text="spec_DESC"
       :error-messages="errors.collect('specDesc')"
@@ -311,14 +311,14 @@ export default {
     work_PRGS_STAT_CD: '',
     mat_SEQ: ''
   }),
-  created () {
+  async created () {
     // get props to variables
     this.work_NO = this.p_WORK_NO
     this.work_PRGS_STAT_CD = this.p_WORK_PRGS_STAT_CD
     this.mat_SEQ = this.p_MAT_SEQ
 
     this.isFinished = this.work_PRGS_STAT_CD !== '4'
-    this.$http.get(this.$path + '/m/getDirectCostDetail.do', {
+    await this.$http.get(this.$path + '/m/getDirectCostDetail.do', {
       params: { WORK_NO: this.work_NO, MAT_SEQ: this.mat_SEQ }
     }).then(resp => {
       this.directCostDetails = resp.data.response
@@ -328,15 +328,6 @@ export default {
       this.$http.get(this.$path + '/m/getWorkType.do').then(resp => {
         this.matTypes = resp.data.response
         this.matTypes.push({ code_CD: '99', code_DESC1: '단가미적용' })
-      })
-
-      this.$http.get(this.$path + '/m/getCtrlInfo.do', {
-        params: { CLS_ID: 'BSP826' }
-      }).then(resp => {
-        this.demolTypes = resp.data.response
-        this.demolType = this.demolTypes[parseInt(this.directCostDetail.dmol_COST_CD, '10')]
-        this.mcstInit = this.matInfo.mcst_PRCE / this.demolType.code_CTRL01
-        this.pexpInit = this.matInfo.pexp_PRCE / this.demolType.code_CTRL01
       })
 
       this.$http.get(this.$path + '/m/getCtrlInfo.do', {
@@ -353,46 +344,55 @@ export default {
         this.spaceType = this.spaceTypes[parseInt(this.directCostDetail.spac_PRI_CD, '10')]
       })
 
-      if (this.directCostDetail.wrk_TYPE_CD === null) {
-        this.matType = '99'
-      } else {
-        this.matType = this.directCostDetail.wrk_TYPE_CD
-      }
+      this.$http.get(this.$path + '/m/getCtrlInfo.do', {
+        params: { CLS_ID: 'BSP826' }
+      }).then(resp => {
+        this.demolTypes = resp.data.response
+        this.demolType = this.demolTypes[parseInt(this.directCostDetail.dmol_COST_CD, '10')]
+        this.mcstInit = this.matInfo.mcst_PRCE / this.demolType.code_CTRL01
+        this.pexpInit = this.matInfo.pexp_PRCE / this.demolType.code_CTRL01
 
-      if (this.directCostDetail.mat_NO === '*') {
-        this.matInfos.push({
-          mat_NM: this.directCostDetail.mat_NM,
-          mat_NO: this.directCostDetail.mat_NO,
-          mcst_PRCE: this.directCostDetail.mcst_PRCE,
-          pexp_PRCE: this.directCostDetail.pexp_PRCE,
-          pre_YY_MCST_PRCE: null,
-          pre_YY_PEXP_PRCE: null,
-          spec_DESC: this.directCostDetail.spec_DESC,
-          unit_DESC: this.directCostDetail.unit_DESC,
-          use_CD: null,
-          use_NM: null,
-          use_YY: null,
-          wrk_TYPE_CD: null,
-          wrk_TYPE_NM: null
-        })
-        this.matInfo = this.matInfos[0]
-        this.matQty = this.directCostDetail.mat_QTY
-        this.timeCost = this.directCostDetail.tm_PRI_AMT
-        this.spaceCost = this.directCostDetail.pri_AMT
-        this.description = this.directCostDetail.rmk_DESC
-        this.changeQty()
-      } else {
-        this.$http.get(this.$path + '/m/getMatInfo.do', {
-          params: { WRK_TYPE_CD: this.directCostDetail.wrk_TYPE_CD, MAT_NO: this.directCostDetail.mat_NO }
-        }).then(resp => {
-          this.matInfos = resp.data.response
+        if (this.directCostDetail.mat_NO === '*') {
+          this.matInfos.push({
+            mat_NM: this.directCostDetail.mat_NM,
+            mat_NO: this.directCostDetail.mat_NO,
+            mcst_PRCE: this.directCostDetail.mcst_PRCE,
+            pexp_PRCE: this.directCostDetail.pexp_PRCE,
+            pre_YY_MCST_PRCE: null,
+            pre_YY_PEXP_PRCE: null,
+            spec_DESC: this.directCostDetail.spec_DESC,
+            unit_DESC: this.directCostDetail.unit_DESC,
+            use_CD: null,
+            use_NM: null,
+            use_YY: null,
+            wrk_TYPE_CD: null,
+            wrk_TYPE_NM: null
+          })
           this.matInfo = this.matInfos[0]
           this.matQty = this.directCostDetail.mat_QTY
           this.timeCost = this.directCostDetail.tm_PRI_AMT
           this.spaceCost = this.directCostDetail.pri_AMT
           this.description = this.directCostDetail.rmk_DESC
-          this.changeMatInfo()
-        })
+          this.changeQty()
+        } else {
+          this.$http.get(this.$path + '/m/getMatInfo.do', {
+            params: { WRK_TYPE_CD: this.directCostDetail.wrk_TYPE_CD, MAT_NO: this.directCostDetail.mat_NO }
+          }).then(resp => {
+            this.matInfos = resp.data.response
+            this.matInfo = this.matInfos[0]
+            this.matQty = this.directCostDetail.mat_QTY
+            this.timeCost = this.directCostDetail.tm_PRI_AMT
+            this.spaceCost = this.directCostDetail.pri_AMT
+            this.description = this.directCostDetail.rmk_DESC
+            this.changeMatInfo()
+          })
+        }
+      })
+
+      if (this.directCostDetail.wrk_TYPE_CD === null) {
+        this.matType = '99'
+      } else {
+        this.matType = this.directCostDetail.wrk_TYPE_CD
       }
       this.isLoaded = true
     })
@@ -462,6 +462,11 @@ export default {
       })
     },
     changeType (type) {
+      if (type === '99') {
+        alert('단가미적용 항목은 PC버전에서 등록해 주시기 바랍니다.')
+        this.matType = ''
+        return
+      }
       this.$http.get(this.$path + '/m/getMatInfo.do', {
         params: { WRK_TYPE_CD: type }
       }).then(resp => {

@@ -15,6 +15,7 @@ export default new Router({
       path: '/',
       name: 'WorkList',
       component: WorkList,
+      props: true,
       meta: {
         title: '정산서 현황'
       }

@@ -38,32 +38,9 @@
                 class="mt-0 pr-0 compact-form"
               ></v-switch>
               <v-spacer></v-spacer>
-              <router-link
-                :to="{
-                  name: 'DirectCostUpdate',
-                  params: {
-                    p_WORK_NO: work_NO,
-                    p_WORK_PRGS_STAT_CD: work_PRGS_STAT_CD,
-                    p_MAT_SEQ: props.item.mat_SEQ
-                  }
-                }"
-                tag="span"
-              >
-                <v-list-tile-title><h5>{{ props.item.mat_NM.substr(props.item.mat_NM.indexOf(':') + 1, props.item.mat_NM.indexOf(':') + 18) }}</h5></v-list-tile-title>
-              </router-link>
+              <v-list-tile-title class="font-weight-medium" @click="onClickMatInfo(props)">{{ props.item.mat_NM.substr(props.item.mat_NM.indexOf(':') + 1) }}</v-list-tile-title>
             </v-card-title>
             <v-list dense class="none-padding">
-              <router-link
-                :to="{
-                  name: 'DirectCostUpdate',
-                  params: {
-                    p_WORK_NO: work_NO,
-                    p_WORK_PRGS_STAT_CD: work_PRGS_STAT_CD,
-                    p_MAT_SEQ: props.item.mat_SEQ
-                  }
-                }"
-                tag="span"
-              >
               <v-list-tile>
                 <v-list-tile-content>합계:</v-list-tile-content>
                 <v-list-tile-content class="align-end">{{ props.item.total_SUM }}</v-list-tile-content>
@@ -72,7 +49,6 @@
                 <v-list-tile-content>시간할증금:</v-list-tile-content>
                 <v-list-tile-content class="align-end">{{ props.item.tm_PRI_AMT }}</v-list-tile-content>
               </v-list-tile>
-              </router-link>
             </v-list>
             <v-list v-if="props.item.expanded" dense>
               <v-list-tile>
@@ -127,12 +103,20 @@
           <v-divider></v-divider>
           <v-list dense class="none-padding" :hidden="!isSaved">
             <v-list-tile>
-              <v-list-tile-content>직접비합계:</v-list-tile-content>
-              <v-list-tile-content class="align-end">{{ directWholeCost }}</v-list-tile-content>
+              <v-list-tile-content>자재비합계:</v-list-tile-content>
+              <v-list-tile-content class="align-end">{{ Math.round(mcstWholeCost) }}</v-list-tile-content>
+            </v-list-tile>
+            <v-list-tile>
+              <v-list-tile-content>인건비합계:</v-list-tile-content>
+              <v-list-tile-content class="align-end">{{ Math.round(pexpWholeCost) }}</v-list-tile-content>
             </v-list-tile>
             <v-list-tile>
               <v-list-tile-content>시간할증금:</v-list-tile-content>
-              <v-list-tile-content class="align-end">{{ timeWholeCost }}</v-list-tile-content>
+              <v-list-tile-content class="align-end">{{ Math.round(timeWholeCost) }}</v-list-tile-content>
+            </v-list-tile>
+            <v-list-tile>
+              <v-list-tile-content class="yellow--text">직접비합계:</v-list-tile-content>
+              <v-list-tile-content class="align-end yellow--text">{{ Math.round(directWholeCost) }}</v-list-tile-content>
             </v-list-tile>
           </v-list>
         </v-card>
@@ -209,14 +193,18 @@ export default {
       isLoaded: false,
       work_NO: '',
       work_PRGS_STAT_CD: '',
-      isSaved: false
+      isSaved: false,
+      isFirst: true
     }
   },
   created () {
-    this.init()
+    if (!this.isFirst) {
+      this.init()
+      this.isFirst = false
+    }
   },
   activated () {
-    if (this.isChanged) {
+    if (this.isChanged && this.isFirst) {
       this.init()
     }
   },
@@ -227,6 +215,10 @@ export default {
       this.work_PRGS_STAT_CD = this.p_WORK_PRGS_STAT_CD
 
       this.isFinished = this.work_PRGS_STAT_CD !== '4'
+      this.mcstWholeCost = 0
+      this.pexpWholeCost = 0
+      this.timeWholeCost = 0
+      this.spaceWholeCost = 0
 
       this.$http.get(this.$path + '/m/getDirectCost.do', {
         params: { WORK_NO: this.work_NO }
@@ -248,6 +240,20 @@ export default {
         })
         this.isLoaded = true
       })
+    },
+    onClickMatInfo (props) {
+      if (this.isFinished) {
+        alert('정산완료된 정산서는 수정이 불가합니다.')
+      } else {
+        this.$router.push({
+          name: 'DirectCostUpdate',
+          params: {
+            p_WORK_NO: this.work_NO,
+            p_WORK_PRGS_STAT_CD: this.work_PRGS_STAT_CD,
+            p_MAT_SEQ: props.item.mat_SEQ
+          }
+        })
+      }
     }
   }
 }

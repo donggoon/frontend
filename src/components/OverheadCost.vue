@@ -121,7 +121,6 @@ export default {
     this.pexp_WHOLE_AMT = this.p_PEXP_WHOLE_AMT
     this.tm_PRI_WHOLE_AMT = this.p_TM_PRI_WHOLE_AMT
     this.pri_WHOLE_AMT = this.p_PRI_WHOLE_AMT
-
     this.isFinished = this.work_PRGS_STAT_CD !== '4'
     this.directWholeCost = this.mcst_WHOLE_AMT + this.pexp_WHOLE_AMT
     this.$http.get(this.$path + '/m/selectOverheadCost.do', {
@@ -170,9 +169,10 @@ export default {
     })
   },
   methods: {
-    updateOverheadCost () {
+    async updateOverheadCost () {
       confirm('저장하시겠습니까?')
-      for (let i = 0; i < this.overheadCosts.length; i++) {
+      for (let i = 0; i < this.overheadCosts.length - 2; i++) {
+        console.log(this.overheadCosts[i])
         this.$http.get(this.$path + '/m/mergeOverheadCost.do', {
           params: {
             WORK_NO: this.work_NO,
@@ -182,6 +182,18 @@ export default {
           }
         })
       }
+      await this.$http.get(this.$path + '/m/updateWorkInfo.do', {
+        params: {
+          WORK_NO: this.work_NO,
+          PEXP_WHOLE_AMT: this.pexpWholeCost,
+          MCST_WHOLE_AMT: this.mcstWholeCost,
+          WORK_PRGS_STAT_CD: '4',
+          ETC_COST_USE_CD: (this.etcCost ? 'Y' : 'N'),
+          OCST_WHOLE_AMT: this.overheadWholeCost,
+          WRK_COST: this.workCost
+        }
+      })
+      alert('임시저장 완료되었습니다.')
     },
     changeEtcCost () {
       if (this.etcCost) {

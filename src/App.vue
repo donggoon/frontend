@@ -16,10 +16,6 @@
     >
       <v-list class="pa-1">
         <v-list-tile avatar>
-          <v-list-tile-avatar>
-            <img src="./assets/hanwha.jpg">
-          </v-list-tile-avatar>
-
           <v-list-tile-content>
             <v-list-tile-title>{{ corpName }} 님 환영합니다!</v-list-tile-title>
           </v-list-tile-content>
@@ -35,16 +31,9 @@
           <v-list-tile-action>
             <v-icon>{{ item.icon }}</v-icon>
           </v-list-tile-action>
-          <router-link
-            :to="{
-              name: item.link
-            }"
-            tag="li"
-          >
           <v-list-tile-content>
-            <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+            <v-list-tile-title @click="onClickMenu(item)">{{ item.title }}</v-list-tile-title>
           </v-list-tile-content>
-        </router-link>
         </v-list-tile>
       </v-list>
     </v-navigation-drawer>
@@ -63,17 +52,30 @@ export default {
   name: 'App',
   data () {
     return {
-      drawer: null,
+      drawer: true,
       items: [
-        { title: '외주공사(접수대기) 리스트', icon: 'dashboard', link: 'WorkList' },
-        { title: '품질평가 리스트', icon: 'dashboard', link: 'WorkList' },
         { title: '정산현황', icon: 'dashboard', link: 'WorkList' },
-        { title: '표준단가계약', icon: 'dashboard', link: 'WorkList' },
-        { title: '작업현황조회', icon: 'dashboard', link: 'WorkList' },
-        { title: '시설공사 게시판', icon: 'dashboard', link: 'WorkList' },
-        { title: '협력사 공지', icon: 'dashboard', link: 'WorkList' }
+        { title: 'PC버전으로 보기', icon: 'dashboard', link: '/main/WORK_CORP_MAIN_LIST_01.do' }
       ],
-      corpName: '한화시스템/ICT'
+      corpInfo: [],
+      corpName: ''
+    }
+  },
+  created () {
+    this.$http.get(this.$path + '/m/getCorpInfo.do').then(resp => {
+      this.corpInfo = resp.data.response
+      this.corpName = this.corpInfo.coNm
+    })
+  },
+  methods: {
+    onClickMenu (item) {
+      if (item.link === '/main/WORK_CORP_MAIN_LIST_01.do') {
+        window.location.href = this.$path + item.link
+      } else {
+        this.$router.push({
+          name: item.link
+        })
+      }
     }
   }
 }

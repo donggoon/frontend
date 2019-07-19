@@ -361,6 +361,11 @@ export default {
       })
     },
     changeType (type) {
+      if (type === '99') {
+        alert('단가미적용 항목은 PC버전에서 등록해 주시기 바랍니다.')
+        this.matType = ''
+        return
+      }
       this.$http.get(this.$path + '/m/getMatInfo.do', {
         params: { WRK_TYPE_CD: type }
       }).then(resp => {
