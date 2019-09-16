@@ -21,6 +21,20 @@
         <template>
           <v-progress-linear :indeterminate="!isLoaded" :hidden="isLoaded" class="none-padding"></v-progress-linear>
         </template>
+        <v-card>
+          <v-divider></v-divider>
+          <v-card-title class="none-padding overflow-hidden">
+            등록된 직접비 항목이 없습니다.
+            <v-spacer></v-spacer>
+            <v-list-tile-title class="font-weight-medium">항목 추가하기</v-list-tile-title>
+          </v-card-title>
+          <v-list dense class="none-padding">
+            <v-list-tile>
+              <v-list-tile-content>항목 추가하기</v-list-tile-content>
+              <v-list-tile-content class="align-end"></v-list-tile-content>
+            </v-list-tile>
+          </v-list>
+        </v-card>
       </template>
       <template v-slot:item="props">
         <v-flex
@@ -43,7 +57,7 @@
             <v-list dense class="none-padding">
               <v-list-tile>
                 <v-list-tile-content>합계:</v-list-tile-content>
-                <v-list-tile-content class="align-end">{{ props.item.total_SUM }}</v-list-tile-content>
+                <v-list-tile-content class="align-end">{{ numberWithCommas(props.item.total_SUM) }}</v-list-tile-content>
               </v-list-tile>
               <v-list-tile>
                 <v-list-tile-content>시간할증금:</v-list-tile-content>
@@ -141,31 +155,33 @@
     >
     <v-icon>add</v-icon>
     </v-btn>
-    <div class="text-xs-center">
-      <v-btn
-        :to="{
-          name: 'WorkList'
-        }"
-        color="primary"
-        dark
-      >공사목록</v-btn>
-      <v-btn
-        :to="{
-          name: 'OverheadCost',
-          params: {
-            p_WORK_NO: this.work_NO,
-            p_WORK_PRGS_STAT_CD: this.work_PRGS_STAT_CD,
-            p_PEXP_WHOLE_AMT: this.pexpWholeCost,
-            p_MCST_WHOLE_AMT: this.mcstWholeCost,
-            p_TM_PRI_WHOLE_AMT: this.timeWholeCost,
-            p_PRI_WHOLE_AMT: this.spaceWholeCost
-          }
-        }"
-        color="primary"
-        dark
-        class="pl-0 pr-0"
-      >간접비현황</v-btn>
-    </div>
+    <v-btn
+      :to="{
+        name: 'WorkList'
+      }"
+      color="primary"
+      dark
+      bottom
+      fixed
+    >공사목록</v-btn>
+    <v-btn
+      :to="{
+        name: 'OverheadCost',
+        params: {
+          p_WORK_NO: this.work_NO,
+          p_WORK_PRGS_STAT_CD: this.work_PRGS_STAT_CD,
+          p_PEXP_WHOLE_AMT: this.pexpWholeCost,
+          p_MCST_WHOLE_AMT: this.mcstWholeCost,
+          p_TM_PRI_WHOLE_AMT: this.timeWholeCost,
+          p_PRI_WHOLE_AMT: this.spaceWholeCost
+        }
+      }"
+      color="primary"
+      dark
+      bottom
+      fixed
+      class="pl-0 pr-0"
+    >간접비현황</v-btn>
   </div>
 </template>
 
@@ -219,6 +235,9 @@ export default {
       this.pexpWholeCost = 0
       this.timeWholeCost = 0
       this.spaceWholeCost = 0
+
+      let form = new FormData()
+      form.append('WORK_NO', this.work_NO)
 
       this.$http.get(this.$path + '/m/getDirectCost.do', {
         params: { WORK_NO: this.work_NO }

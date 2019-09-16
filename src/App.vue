@@ -54,8 +54,7 @@ export default {
     return {
       drawer: true,
       items: [
-        { title: '정산현황', icon: 'dashboard', link: 'WorkList' },
-        { title: 'PC버전으로 보기', icon: 'dashboard', link: '/main/WORK_CORP_MAIN_LIST_01.do' }
+        { title: '정산현황', icon: 'dashboard', link: 'WorkList' }
       ],
       corpInfo: [],
       corpName: ''
@@ -69,13 +68,9 @@ export default {
   },
   methods: {
     onClickMenu (item) {
-      if (item.link === '/main/WORK_CORP_MAIN_LIST_01.do') {
-        window.location.href = this.$path + item.link
-      } else {
-        this.$router.push({
-          name: item.link
-        })
-      }
+      this.$router.push({
+        name: item.link
+      })
     }
   }
 }

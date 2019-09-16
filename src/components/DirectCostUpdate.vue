@@ -250,6 +250,7 @@
 <script>
 import Vue from 'vue'
 import VeeValidate from 'vee-validate'
+import util from '@/common/util'
 Vue.use(VeeValidate)
 
 export default {
@@ -499,29 +500,39 @@ export default {
       if (this.demolType !== null) this.changeDemolType()
       if (this.timeType !== null) this.changeTimeType()
       if (this.spaceType !== null) this.changeSpaceType()
+      this.pexpTotal = Math.round(this.pexpTotal * 10) / 10
+      this.mcstTotal = Math.round(this.mcstTotal * 10) / 10
+      this.total = Math.round(this.total * 10) / 10
     },
     changeDemolType () {
       if (this.matQty === null) return
       if (this.subContract === null) {
         if (this.demolType.code_CD !== '0') {
           this.matInfo.mcst_PRCE = 0
-        } else this.matInfo.mcst_PRCE = Math.round(this.mcstInit * this.demolType.code_CTRL01 * 10) / 10
+        } else this.matInfo.mcst_PRCE = this.mcstInit * this.demolType.code_CTRL01
       } else this.matInfo.mcst_PRCE = 0
-      this.matInfo.pexp_PRCE = Math.round(this.pexpInit * this.demolType.code_CTRL01 * 10) / 10
-      this.pexpTotal = Math.round(this.matInfo.pexp_PRCE * this.matQty * 10) / 10
+      this.matInfo.pexp_PRCE = this.pexpInit * this.demolType.code_CTRL01
+      this.pexpTotal = this.matInfo.pexp_PRCE * this.matQty
       if (this.subContract) this.mcstTotal = 0
-      else this.mcstTotal = Math.round(this.matInfo.mcst_PRCE * this.matQty * 10) / 10
-      this.total = Math.round((this.pexpTotal + this.mcstTotal) * 10) / 10
+      else this.mcstTotal = this.matInfo.mcst_PRCE * this.matQty
       if (this.timeType !== null) this.changeTimeType()
       if (this.spaceType !== null) this.changeSpaceType()
+      this.total = this.pexpTotal + this.mcstTotal
+      this.matInfo.mcst_PRCE = Math.round(this.matInfo.mcst_PRCE * 10) / 10
+      this.matInfo.pexp_PRCE = Math.round(this.matInfo.pexp_PRCE * 10) / 10
+      this.pexpTotal = Math.round(this.pexpTotal * 10) / 10
+      this.mcstTotal = Math.round(this.mcstTotal * 10) / 10
+      this.total = Math.round(this.total * 10) / 10
     },
     changeTimeType () {
       if (this.timeType === '00') this.timeCost = 0
-      else this.timeCost = Math.round(this.pexpTotal * this.timeType.code_CTRL01)
+      else this.timeCost = this.pexpTotal * this.timeType.code_CTRL01
+      this.timeCost = Math.round(this.timeCost)
     },
     changeSpaceType () {
       if (this.spaceType === '00') this.spaceCost = 0
-      else this.spaceCost = Math.round(this.pexpTotal * this.spaceType.code_CTRL01)
+      else this.spaceCost = this.pexpTotal * this.spaceType.code_CTRL01
+      this.spaceCost = Math.round(this.spaceCost)
     },
     changeSubContract () {
       this.changeQty()

@@ -172,7 +172,6 @@ export default {
     async updateOverheadCost () {
       confirm('저장하시겠습니까?')
       for (let i = 0; i < this.overheadCosts.length - 2; i++) {
-        console.log(this.overheadCosts[i])
         this.$http.get(this.$path + '/m/mergeOverheadCost.do', {
           params: {
             WORK_NO: this.work_NO,
