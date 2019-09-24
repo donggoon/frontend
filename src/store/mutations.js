@@ -7,8 +7,4 @@ const onClickDrawer = (state) => {
   state.drawer = !state.drawer
 }
 
-const closeDrawer = (state) => {
-  state.drawer = false
-}
-
-export { setCorpInfo, onClickDrawer, closeDrawer }
+export { setCorpInfo, onClickDrawer }

@@ -18,23 +18,9 @@
       hide-actions
     >
       <template v-slot:no-data>
-        <template>
-          <v-progress-linear :indeterminate="!isLoaded" :hidden="isLoaded" class="none-padding"></v-progress-linear>
-        </template>
-        <v-card>
-          <v-divider></v-divider>
-          <v-card-title class="none-padding overflow-hidden">
-            등록된 직접비 항목이 없습니다.
-            <v-spacer></v-spacer>
-            <v-list-tile-title class="font-weight-medium">항목 추가하기</v-list-tile-title>
-          </v-card-title>
-          <v-list dense class="none-padding">
-            <v-list-tile>
-              <v-list-tile-content>항목 추가하기</v-list-tile-content>
-              <v-list-tile-content class="align-end"></v-list-tile-content>
-            </v-list-tile>
-          </v-list>
-        </v-card>
+        <v-alert slot="no-results" :value="true" color="error" icon="warning">
+          등록된 직접비 항목이 없습니다.
+        </v-alert>
       </template>
       <template v-slot:item="props">
         <v-flex
@@ -112,6 +98,7 @@
         sm6
         md4
         lg3
+        dark
       >
         <v-card dark>
           <v-divider></v-divider>

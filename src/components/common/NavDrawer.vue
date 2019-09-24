@@ -2,8 +2,8 @@
   <v-navigation-drawer
     :value="getDrawer"
     fixed
-    left
-    temporary
+    right
+    stateless
   >
     <v-list class="pa-1">
       <v-list-tile avatar>
