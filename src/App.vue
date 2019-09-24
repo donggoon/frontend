@@ -1,42 +1,7 @@
 <template>
   <v-app>
-    <v-toolbar dark color="primary" absolute>
-      <v-toolbar-side-icon
-        @click.stop="drawer = !drawer"
-      >
-      </v-toolbar-side-icon>
-
-      <v-toolbar-title class="white--text">{{ this.$route.meta.title }}</v-toolbar-title>
-    </v-toolbar>
-
-    <v-navigation-drawer
-      v-model="drawer"
-      fixed
-      temporary
-    >
-      <v-list class="pa-1">
-        <v-list-tile avatar>
-          <v-list-tile-content>
-            <v-list-tile-title>{{ corpName }} 님 환영합니다!</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-      </v-list>
-
-      <v-list class="pt-0" dense>
-        <v-divider></v-divider>
-        <v-list-tile
-          v-for="item in items"
-          :key="item.title"
-        >
-          <v-list-tile-action>
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title @click="onClickMenu(item)">{{ item.title }}</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-      </v-list>
-    </v-navigation-drawer>
+    <tool-bar/>
+    <nav-drawer/>
     <v-content>
       <transition>
         <keep-alive :include="['DirectCost']">
@@ -48,30 +13,29 @@
 </template>
 
 <script>
+import { mapGetters, mapMutations } from 'vuex'
+import NavDrawer from './components/common/NavDrawer'
+import ToolBar from './components/common/ToolBar'
+
 export default {
   name: 'App',
+  components: {
+    NavDrawer,
+    ToolBar
+  },
   data () {
-    return {
-      drawer: true,
-      items: [
-        { title: '정산현황', icon: 'dashboard', link: 'WorkList' }
-      ],
-      corpInfo: [],
-      corpName: ''
-    }
+    return {}
   },
   created () {
     this.$http.get(this.$path + '/m/getCorpInfo.do').then(resp => {
-      this.corpInfo = resp.data.response
-      this.corpName = this.corpInfo.coNm
+      this.setCorpInfo(resp)
     })
   },
+  computed: {
+    ...mapGetters(['getDrawer'])
+  },
   methods: {
-    onClickMenu (item) {
-      this.$router.push({
-        name: item.link
-      })
-    }
+    ...mapMutations(['setCorpInfo', 'onClickDrawer'])
   }
 }
 </script>
