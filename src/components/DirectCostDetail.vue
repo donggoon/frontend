@@ -207,7 +207,7 @@
       rows="1"
       class="none-padding ml-2 mr-2"
     ></v-textarea>
-    <div class="text-xs-center">
+    <div class="text-xs-center div-button">
       <v-btn
         @click="insertDirectCost"
         color="primary"
@@ -442,5 +442,20 @@ export default {
 .none-padding {
   padding-top: 0;
   padding-bottom: 0;
+}
+
+div.div-button {
+  position: sticky;
+  background-color: white;
+  bottom: 0;
+  width: 100%;
+  line-height:50px;
+  text-align:center;
+}
+
+div.div-button > v-btn {
+  max-width: 100%;
+  max-height: 100%;
+  vertical-align: middle;
 }
 </style>

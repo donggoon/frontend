@@ -57,7 +57,7 @@
             <v-list dense class="none-padding">
               <v-list-tile>
                 <v-list-tile-content>합계:</v-list-tile-content>
-                <v-list-tile-content class="align-end">{{ numberWithCommas(props.item.total_SUM) }}</v-list-tile-content>
+                <v-list-tile-content class="align-end">{{ props.item.total_SUM }}</v-list-tile-content>
               </v-list-tile>
               <v-list-tile>
                 <v-list-tile-content>시간할증금:</v-list-tile-content>
@@ -136,52 +136,49 @@
         </v-card>
       </v-flex>
     </template>
-    <v-btn
-      :to="{
-        name: 'DirectCostDetail',
-        params: {
-          p_WORK_NO: this.work_NO,
-          p_WORK_PRGS_STAT_CD: this.work_PRGS_STAT_CD,
-          p_MAT_SEQ: this.mat_SEQ
-        }
-      }"
-      :disabled="isFinished"
-      fixed
-      dark
-      icon
-      bottom
-      right
-      color="primary"
-    >
-    <v-icon>add</v-icon>
-    </v-btn>
-    <v-btn
-      :to="{
-        name: 'WorkList'
-      }"
-      color="primary"
-      dark
-      bottom
-      fixed
-    >공사목록</v-btn>
-    <v-btn
-      :to="{
-        name: 'OverheadCost',
-        params: {
-          p_WORK_NO: this.work_NO,
-          p_WORK_PRGS_STAT_CD: this.work_PRGS_STAT_CD,
-          p_PEXP_WHOLE_AMT: this.pexpWholeCost,
-          p_MCST_WHOLE_AMT: this.mcstWholeCost,
-          p_TM_PRI_WHOLE_AMT: this.timeWholeCost,
-          p_PRI_WHOLE_AMT: this.spaceWholeCost
-        }
-      }"
-      color="primary"
-      dark
-      bottom
-      fixed
-      class="pl-0 pr-0"
-    >간접비현황</v-btn>
+    <div class="text-xs-center div-button">
+      <v-btn
+        :to="{
+          name: 'WorkList'
+        }"
+        color="primary"
+        dark
+      >공사목록</v-btn>
+      <v-btn
+        :to="{
+          name: 'OverheadCost',
+          params: {
+            p_WORK_NO: this.work_NO,
+            p_WORK_PRGS_STAT_CD: this.work_PRGS_STAT_CD,
+            p_PEXP_WHOLE_AMT: this.pexpWholeCost,
+            p_MCST_WHOLE_AMT: this.mcstWholeCost,
+            p_TM_PRI_WHOLE_AMT: this.timeWholeCost,
+            p_PRI_WHOLE_AMT: this.spaceWholeCost
+          }
+        }"
+        color="primary"
+        dark
+        class="pl-0 pr-0"
+      >간접비현황</v-btn>
+      <v-btn
+        :to="{
+          name: 'DirectCostDetail',
+          params: {
+            p_WORK_NO: this.work_NO,
+            p_WORK_PRGS_STAT_CD: this.work_PRGS_STAT_CD,
+            p_MAT_SEQ: this.mat_SEQ
+          }
+        }"
+        :disabled="isFinished"
+        fixed
+        dark
+        icon
+        bottom
+        right
+        color="primary"
+      ><v-icon>add</v-icon>
+      </v-btn>
+    </div>
   </div>
 </template>
 
@@ -287,5 +284,24 @@ export default {
 .none-padding {
   padding-top: 0;
   padding-bottom: 0;
+}
+
+div.div-button {
+  position: sticky;
+  background-color: white;
+  bottom: 0;
+  width: 100%;
+  line-height:50px;
+  text-align:center;
+}
+
+div.div-button > v-btn {
+  max-width: 100%;
+  max-height: 100%;
+  vertical-align: middle;
+}
+
+.floating-button {
+  z-index: 10;
 }
 </style>

@@ -32,7 +32,7 @@
       class="mb-0 ml-2 compact-form none-padding"
       label="잡재료/공구손료"
     ></v-checkbox>
-    <div class="text-xs-center">
+    <div class="text-xs-center div-button">
       <v-btn
         :to="{
           name: 'DirectCost',
@@ -249,5 +249,20 @@ export default {
 .none-padding {
   padding-top: 0;
   padding-bottom: 0;
+}
+
+div.div-button {
+  position: absolute;
+  background-color: white;
+  bottom: 0;
+  width: 100%;
+  line-height:50px;
+  text-align:center;
+}
+
+div.div-button > v-btn {
+  max-width: 100%;
+  max-height: 100%;
+  vertical-align: middle;
 }
 </style>

@@ -220,7 +220,7 @@
       class="none-padding ml-2 mr-2"
     ></v-textarea>
 
-    <div class="text-xs-center">
+    <div class="text-xs-center div-button">
       <v-btn
         @click="updateDirectCost"
         :disabled="isFinished"
@@ -250,9 +250,7 @@
 <script>
 import Vue from 'vue'
 import VeeValidate from 'vee-validate'
-import util from '@/common/util'
 Vue.use(VeeValidate)
-
 export default {
   name: 'DirectCostUpdate',
   props: ['p_WORK_NO', 'p_WORK_PRGS_STAT_CD', 'p_MAT_SEQ'],
@@ -317,7 +315,6 @@ export default {
     this.work_NO = this.p_WORK_NO
     this.work_PRGS_STAT_CD = this.p_WORK_PRGS_STAT_CD
     this.mat_SEQ = this.p_MAT_SEQ
-
     this.isFinished = this.work_PRGS_STAT_CD !== '4'
     await this.$http.get(this.$path + '/m/getDirectCostDetail.do', {
       params: { WORK_NO: this.work_NO, MAT_SEQ: this.mat_SEQ }
@@ -325,26 +322,22 @@ export default {
       this.directCostDetails = resp.data.response
       this.directCostDetail = this.directCostDetails[0]
       this.subContract = this.directCostDetail.carr_USE_CD
-
       this.$http.get(this.$path + '/m/getWorkType.do').then(resp => {
         this.matTypes = resp.data.response
         this.matTypes.push({ code_CD: '99', code_DESC1: '단가미적용' })
       })
-
       this.$http.get(this.$path + '/m/getCtrlInfo.do', {
         params: { CLS_ID: 'BSP827' }
       }).then(resp => {
         this.timeTypes = resp.data.response
         this.timeType = this.timeTypes[parseInt(this.directCostDetail.tm_PRI_CD, '10')]
       })
-
       this.$http.get(this.$path + '/m/getCtrlInfo.do', {
         params: { CLS_ID: 'BSP828' }
       }).then(resp => {
         this.spaceTypes = resp.data.response
         this.spaceType = this.spaceTypes[parseInt(this.directCostDetail.spac_PRI_CD, '10')]
       })
-
       this.$http.get(this.$path + '/m/getCtrlInfo.do', {
         params: { CLS_ID: 'BSP826' }
       }).then(resp => {
@@ -352,7 +345,6 @@ export default {
         this.demolType = this.demolTypes[parseInt(this.directCostDetail.dmol_COST_CD, '10')]
         this.mcstInit = this.matInfo.mcst_PRCE / this.demolType.code_CTRL01
         this.pexpInit = this.matInfo.pexp_PRCE / this.demolType.code_CTRL01
-
         if (this.directCostDetail.mat_NO === '*') {
           this.matInfos.push({
             mat_NM: this.directCostDetail.mat_NM,
@@ -389,7 +381,6 @@ export default {
           })
         }
       })
-
       if (this.directCostDetail.wrk_TYPE_CD === null) {
         this.matType = '99'
       } else {
@@ -550,5 +541,20 @@ export default {
 .none-padding {
   padding-top: 0;
   padding-bottom: 0;
+}
+
+div.div-button {
+  position: sticky;
+  background-color: white;
+  bottom: 0;
+  width: 100%;
+  line-height:50px;
+  text-align:center;
+}
+
+div.div-button > v-btn {
+  max-width: 100%;
+  max-height: 100%;
+  vertical-align: middle;
 }
 </style>
