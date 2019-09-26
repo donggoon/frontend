@@ -250,7 +250,10 @@
 <script>
 import Vue from 'vue'
 import VeeValidate from 'vee-validate'
+import { mapGetters, mapMutations } from 'vuex'
+
 Vue.use(VeeValidate)
+
 export default {
   name: 'DirectCostUpdate',
   props: ['p_WORK_NO', 'p_WORK_PRGS_STAT_CD', 'p_MAT_SEQ'],
@@ -311,6 +314,7 @@ export default {
     mat_SEQ: ''
   }),
   async created () {
+    this.closeDrawer()
     // get props to variables
     this.work_NO = this.p_WORK_NO
     this.work_PRGS_STAT_CD = this.p_WORK_PRGS_STAT_CD
@@ -325,18 +329,42 @@ export default {
       this.$http.get(this.$path + '/m/getWorkType.do').then(resp => {
         this.matTypes = resp.data.response
         this.matTypes.push({ code_CD: '99', code_DESC1: '단가미적용' })
+      }).catch(error => {
+        var errorPage
+        if (this.getRunMode === 'local') {
+          errorPage = error.response.request.responseURL.replace('7070', '9090')
+        } else {
+          errorPage = error.response.request.responseURL
+        }
+        window.location.href = errorPage
       })
       this.$http.get(this.$path + '/m/getCtrlInfo.do', {
         params: { CLS_ID: 'BSP827' }
       }).then(resp => {
         this.timeTypes = resp.data.response
         this.timeType = this.timeTypes[parseInt(this.directCostDetail.tm_PRI_CD, '10')]
+      }).catch(error => {
+        var errorPage
+        if (this.getRunMode === 'local') {
+          errorPage = error.response.request.responseURL.replace('7070', '9090')
+        } else {
+          errorPage = error.response.request.responseURL
+        }
+        window.location.href = errorPage
       })
       this.$http.get(this.$path + '/m/getCtrlInfo.do', {
         params: { CLS_ID: 'BSP828' }
       }).then(resp => {
         this.spaceTypes = resp.data.response
         this.spaceType = this.spaceTypes[parseInt(this.directCostDetail.spac_PRI_CD, '10')]
+      }).catch(error => {
+        var errorPage
+        if (this.getRunMode === 'local') {
+          errorPage = error.response.request.responseURL.replace('7070', '9090')
+        } else {
+          errorPage = error.response.request.responseURL
+        }
+        window.location.href = errorPage
       })
       this.$http.get(this.$path + '/m/getCtrlInfo.do', {
         params: { CLS_ID: 'BSP826' }
@@ -378,8 +406,24 @@ export default {
             this.spaceCost = this.directCostDetail.pri_AMT
             this.description = this.directCostDetail.rmk_DESC
             this.changeMatInfo()
+          }).catch(error => {
+            var errorPage
+            if (this.getRunMode === 'local') {
+              errorPage = error.response.request.responseURL.replace('7070', '9090')
+            } else {
+              errorPage = error.response.request.responseURL
+            }
+            window.location.href = errorPage
           })
         }
+      }).catch(error => {
+        var errorPage
+        if (this.getRunMode === 'local') {
+          errorPage = error.response.request.responseURL.replace('7070', '9090')
+        } else {
+          errorPage = error.response.request.responseURL
+        }
+        window.location.href = errorPage
       })
       if (this.directCostDetail.wrk_TYPE_CD === null) {
         this.matType = '99'
@@ -392,7 +436,11 @@ export default {
   mounted () {
     this.$validator.localize('ko', this.dictionary)
   },
+  computed: {
+    ...mapGetters(['getRunMode'])
+  },
   methods: {
+    ...mapMutations(['closeDrawer']),
     async updateDirectCost () {
       if (!confirm('저장하시겠습니까?')) return
       this.$validator.validateAll()
@@ -469,6 +517,14 @@ export default {
         this.timeCost = 0
         this.total = 0
         this.spaceCost = 0
+      }).catch(error => {
+        var errorPage
+        if (this.getRunMode === 'local') {
+          errorPage = error.response.request.responseURL.replace('7070', '9090')
+        } else {
+          errorPage = error.response.request.responseURL
+        }
+        window.location.href = errorPage
       })
     },
     changeMatInfo () {
@@ -545,7 +601,7 @@ export default {
 
 div.div-button {
   position: sticky;
-  background-color: white;
+  background-color: #fafafa;
   bottom: 0;
   width: 100%;
   line-height:50px;

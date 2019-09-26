@@ -51,6 +51,8 @@
 </template>
 
 <script>
+import { mapGetters, mapMutations } from 'vuex'
+
 export default {
   name: 'WorkList',
   data () {
@@ -60,12 +62,25 @@ export default {
     }
   },
   created () {
+    this.closeDrawer()
     this.$http.get(this.$path + '/m/getWorkList.do').then(resp => {
       this.items = resp.data.response
       this.isLoaded = true
+    }).catch(error => {
+      var errorPage
+      if (this.getRunMode === 'local') {
+        errorPage = error.response.request.responseURL.replace('7070', '9090')
+      } else {
+        errorPage = error.response.request.responseURL
+      }
+      window.location.href = errorPage
     })
   },
+  computed: {
+    ...mapGetters(['getRunMode'])
+  },
   methods: {
+    ...mapMutations(['closeDrawer']),
     onClickWorkList (item) {
       this.$router.push({
         name: 'DirectCost',

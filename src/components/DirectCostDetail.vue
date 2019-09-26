@@ -228,6 +228,7 @@
 <script>
 import Vue from 'vue'
 import VeeValidate from 'vee-validate'
+import { mapGetters, mapMutations } from 'vuex'
 
 Vue.use(VeeValidate)
 
@@ -286,6 +287,7 @@ export default {
     mat_SEQ: ''
   }),
   created () {
+    this.closeDrawer()
     // get props to variables
     this.work_NO = this.p_WORK_NO
     this.work_PRGS_STAT_CD = this.p_WORK_PRGS_STAT_CD
@@ -294,30 +296,66 @@ export default {
     this.$http.get(this.$path + '/m/getWorkType.do').then(resp => {
       this.matTypes = resp.data.response
       this.matTypes.push({ code_CD: '99', code_DESC1: '단가미적용' })
+    }).catch(error => {
+      var errorPage
+      if (this.getRunMode === 'local') {
+        errorPage = error.response.request.responseURL.replace('7070', '9090')
+      } else {
+        errorPage = error.response.request.responseURL
+      }
+      window.location.href = errorPage
     })
     this.$http.get(this.$path + '/m/getCtrlInfo.do', {
       params: { CLS_ID: 'BSP826' }
     }).then(resp => {
       this.demolTypes = resp.data.response
       this.demolType = this.demolTypes[0]
+    }).catch(error => {
+      var errorPage
+      if (this.getRunMode === 'local') {
+        errorPage = error.response.request.responseURL.replace('7070', '9090')
+      } else {
+        errorPage = error.response.request.responseURL
+      }
+      window.location.href = errorPage
     })
     this.$http.get(this.$path + '/m/getCtrlInfo.do', {
       params: { CLS_ID: 'BSP827' }
     }).then(resp => {
       this.timeTypes = resp.data.response
       this.timeType = this.timeTypes[0]
+    }).catch(error => {
+      var errorPage
+      if (this.getRunMode === 'local') {
+        errorPage = error.response.request.responseURL.replace('7070', '9090')
+      } else {
+        errorPage = error.response.request.responseURL
+      }
+      window.location.href = errorPage
     })
     this.$http.get(this.$path + '/m/getCtrlInfo.do', {
       params: { CLS_ID: 'BSP828' }
     }).then(resp => {
       this.spaceTypes = resp.data.response
       this.spaceType = this.spaceTypes[0]
+    }).catch(error => {
+      var errorPage
+      if (this.getRunMode === 'local') {
+        errorPage = error.response.request.responseURL.replace('7070', '9090')
+      } else {
+        errorPage = error.response.request.responseURL
+      }
+      window.location.href = errorPage
     })
   },
   mounted () {
     this.$validator.localize('ko', this.dictionary)
   },
+  computed: {
+    ...mapGetters(['getRunMode'])
+  },
   methods: {
+    ...mapMutations(['closeDrawer']),
     async insertDirectCost () {
       if (!confirm('저장하시겠습니까?')) return
       this.$validator.validateAll()
@@ -370,6 +408,14 @@ export default {
         params: { WRK_TYPE_CD: type }
       }).then(resp => {
         this.matInfos = resp.data.response
+      }).catch(error => {
+        var errorPage
+        if (this.getRunMode === 'local') {
+          errorPage = error.response.request.responseURL.replace('7070', '9090')
+        } else {
+          errorPage = error.response.request.responseURL
+        }
+        window.location.href = errorPage
       })
     },
     changeMatInfo () {
@@ -446,7 +492,7 @@ export default {
 
 div.div-button {
   position: sticky;
-  background-color: white;
+  background-color: #fafafa;
   bottom: 0;
   width: 100%;
   line-height:50px;

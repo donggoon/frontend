@@ -170,6 +170,8 @@
 </template>
 
 <script>
+import { mapGetters, mapMutations } from 'vuex'
+
 export default {
   name: 'DirectCost',
   props: [ 'p_WORK_NO', 'p_WORK_PRGS_STAT_CD', 'isChanged' ],
@@ -198,17 +200,23 @@ export default {
     }
   },
   created () {
+    this.closeDrawer()
     if (!this.isFirst) {
       this.init()
       this.isFirst = false
     }
   },
   activated () {
+    this.closeDrawer()
     if (this.isChanged && this.isFirst) {
       this.init()
     }
   },
+  computed: {
+    ...mapGetters(['getRunMode'])
+  },
   methods: {
+    ...mapMutations(['closeDrawer']),
     init () {
       // get props to variables
       this.work_NO = this.p_WORK_NO
@@ -240,8 +248,24 @@ export default {
           this.mat_SEQ = resp.data.response[0]
           if (this.mat_SEQ > 1) this.isSaved = true
           else this.isSaved = false
+        }).catch(error => {
+          var errorPage
+          if (this.getRunMode === 'local') {
+            errorPage = error.response.request.responseURL.replace('7070', '9090')
+          } else {
+            errorPage = error.response.request.responseURL
+          }
+          window.location.href = errorPage
         })
         this.isLoaded = true
+      }).catch(error => {
+        var errorPage
+        if (this.getRunMode === 'local') {
+          errorPage = error.response.request.responseURL.replace('7070', '9090')
+        } else {
+          errorPage = error.response.request.responseURL
+        }
+        window.location.href = errorPage
       })
     },
     onClickMatInfo (props) {
@@ -275,7 +299,7 @@ export default {
 
 div.div-button {
   position: sticky;
-  background-color: white;
+  background-color: #fafafa;
   bottom: 0;
   width: 100%;
   line-height:50px;

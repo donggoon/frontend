@@ -3,6 +3,7 @@
     :value="getDrawer"
     fixed
     right
+    temporary
     stateless
   >
     <v-list class="pa-1">
@@ -10,11 +11,13 @@
         <v-list-tile-content>
           <v-list-tile-title>{{ this.getCorpName }} 님 환영합니다!</v-list-tile-title>
         </v-list-tile-content>
+        <v-divider></v-divider>
+        <v-icon @click="onClickDrawer">close</v-icon>
       </v-list-tile>
     </v-list>
 
     <v-list class="pt-0" dense>
-      <v-divider></v-divider>
+      <v-divider/>
       <v-list-tile
         v-for="item in getItems"
         :key="item.title"
@@ -40,9 +43,15 @@ export default {
   methods: {
     ...mapMutations(['setCorpInfo', 'onClickDrawer', 'closeDrawer']),
     onClickMenu (item) {
-      this.$router.push({
-        name: item.link
-      })
+      this.closeDrawer()
+      if (item.link === 'WorkList') {
+        this.$router.push({
+          name: item.link
+        })
+      } else {
+        console.log(item.link)
+        window.location.href = item.link
+      }
     }
   }
 }

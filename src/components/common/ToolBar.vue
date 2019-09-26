@@ -5,20 +5,20 @@
     >
     </v-toolbar-side-icon>
 
-    <v-toolbar-title class="white--text">{{ this.$route.meta.title }}</v-toolbar-title>
+    <v-toolbar-title class="white--text">{{ this.$route.meta.title === undefined ? this.$appName : this.$route.meta.title }}</v-toolbar-title>
   </v-toolbar>
 </template>
 
 <script>
-import { mapState, mapMutations } from 'vuex'
+import { mapMutations } from 'vuex'
 export default {
-  data () {
-    return {
-      ...mapState(['drawer'])
-    }
-  },
   methods: {
-    ...mapMutations(['onClickDrawer'])
+    ...mapMutations(['onClickDrawer', 'openDrawer'])
+  },
+  activated () {
+    if (this.$route.meta.title === undefined) {
+      this.openDrawer()
+    }
   }
 }
 </script>

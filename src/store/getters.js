@@ -14,4 +14,13 @@ const getCorpName = (state) => {
   return state.corpName
 }
 
-export { getDrawer, getItems, getCorpInfo, getCorpName }
+const getRunMode = (state) => {
+  return state.runMode
+}
+
+const getContextPath = (state) => {
+  console.log(state.contextPath)
+  return state.contextPath
+}
+
+export { getDrawer, getItems, getCorpInfo, getCorpName, getContextPath, getRunMode }

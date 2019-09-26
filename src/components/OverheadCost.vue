@@ -56,6 +56,8 @@
 </template>
 
 <script>
+import { mapGetters, mapMutations } from 'vuex'
+
 export default {
   name: 'OverheadCost',
   props: [ 'p_WORK_NO', 'p_WORK_PRGS_STAT_CD', 'p_MCST_WHOLE_AMT', 'p_PEXP_WHOLE_AMT', 'p_TM_PRI_WHOLE_AMT', 'p_PRI_WHOLE_AMT' ],
@@ -114,6 +116,7 @@ export default {
     }
   },
   created () {
+    this.closeDrawer()
     // get props to variables
     this.work_NO = this.p_WORK_NO
     this.work_PRGS_STAT_CD = this.p_WORK_PRGS_STAT_CD
@@ -166,9 +169,21 @@ export default {
       })
       this.changeEtcCost()
       this.isLoaded = true
+    }).catch(error => {
+      var errorPage
+      if (this.getRunMode === 'local') {
+        errorPage = error.response.request.responseURL.replace('7070', '9090')
+      } else {
+        errorPage = error.response.request.responseURL
+      }
+      window.location.href = errorPage
     })
   },
+  computed: {
+    ...mapGetters(['getRunMode'])
+  },
   methods: {
+    ...mapMutations(['closeDrawer']),
     async updateOverheadCost () {
       confirm('저장하시겠습니까?')
       for (let i = 0; i < this.overheadCosts.length - 2; i++) {
@@ -253,7 +268,7 @@ export default {
 
 div.div-button {
   position: absolute;
-  background-color: white;
+  background-color: #fafafa;
   bottom: 0;
   width: 100%;
   line-height:50px;

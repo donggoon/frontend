@@ -8,7 +8,7 @@ Vue.use(Vuex)
 
 export const store = new Vuex.Store({
   state: {
-    drawer: false,
+    drawer: true,
     items: [
       // { title: '외주공사(접수대기)리스트', icon: 'dashboard', link: this.$path + '/comp/WORK_WORK_INFO_LIST_05.do' },
       // { title: '품질평가리스트', icon: 'dashboard', link: this.$path + '/comp/WORK_WORK_INFO_LIST_06.do' },
@@ -19,7 +19,9 @@ export const store = new Vuex.Store({
       // { title: '시설공사 게시판', icon: 'dashboard', link: this.$path + '/bbs/WORK_BBS_INFO_LIST_01.do' }
     ],
     corpInfo: [],
-    corpName: ''
+    corpName: '',
+    runMode: location.host === ('localhost:7070' || 'localhost:9090') ? 'local' : (location.host === ('55.101.200.107:9443' || 'stg-us.hanwhatechwin.co.kr:9443') ? 'dev' : 'prod'),
+    contextPath: ''
   },
   getters,
   mutations,
