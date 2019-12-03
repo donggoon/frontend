@@ -28,15 +28,8 @@
 
               <v-list-tile-action>
                 <v-list-tile-action-text class="text--primary">{{ item.pchr_EMPN_NM }}</v-list-tile-action-text>
-                <v-icon
-                  v-if="item.work_PRGS_STAT_CD !== '4'"
-                  color="grey lighten-1"
-                >edit</v-icon>
-
-                <v-icon
-                  v-else
-                  color="yellow darken-2"
-                >edit</v-icon>
+                <i v-if="item.work_PRGS_STAT_CD !== '4'" class="editable-btn" @click="onClickDrawer"/>
+                <i v-else class="ineditable-btn"/>
               </v-list-tile-action>
             </v-list-tile>
             <v-divider
@@ -58,7 +51,8 @@ export default {
   data () {
     return {
       items: [],
-      isLoaded: false
+      isLoaded: false,
+      edit: require('@/assets/edit-24px.svg')
     }
   },
   created () {
@@ -94,3 +88,20 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.editable-btn {
+  width: 24px;
+  height: 24px;
+  -webkit-mask-image: url('../assets/edit-24px.svg');
+  mask-image: url('..//assets/edit-24px.svg');
+  background-color: grey;
+}
+.ineditable-btn {
+  width: 24px;
+  height: 24px;
+  -webkit-mask-image: url('../assets/edit-24px.svg');
+  mask-image: url('..//assets/edit-24px.svg');
+  background-color: transparent;
+}
+</style>

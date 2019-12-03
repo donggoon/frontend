@@ -18,7 +18,8 @@
       hide-actions
     >
       <template v-slot:no-data>
-        <v-alert slot="no-results" :value="true" color="error" icon="warning">
+        <v-alert slot="no-results" :value="true" color="error">
+          <i class="warning-btn v-icon v-alert__icon"></i>
           등록된 직접비 항목이 없습니다.
         </v-alert>
       </template>
@@ -163,7 +164,7 @@
         bottom
         right
         color="primary"
-      ><v-icon>add</v-icon>
+      ><i class="add-btn" @click.stop="onClickDrawer"/>
       </v-btn>
     </div>
   </div>
@@ -314,5 +315,21 @@ div.div-button > v-btn {
 
 .floating-button {
   z-index: 10;
+}
+
+.add-btn {
+  width: 24px;
+  height: 24px;
+  -webkit-mask-image: url('../assets/add-24px.svg');
+  mask-image: url('../assets/add-24px.svg');
+  background-color: white;
+}
+
+.warning-btn {
+  width: 24px;
+  height: 24px;
+  -webkit-mask-image: url('../assets/warning-24px.svg');
+  mask-image: url('../assets/warning-24px.svg');
+  background-color: white;
 }
 </style>

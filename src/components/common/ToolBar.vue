@@ -1,10 +1,6 @@
 <template>
   <v-toolbar dark color="primary" absolute>
-    <v-toolbar-side-icon
-      @click.stop="onClickDrawer"
-    >
-    </v-toolbar-side-icon>
-
+    <i class="menu-btn" @click.stop="onClickDrawer"/>
     <v-toolbar-title class="white--text">{{ this.$route.meta.title === undefined ? this.$appName : this.$route.meta.title }}</v-toolbar-title>
   </v-toolbar>
 </template>
@@ -22,3 +18,13 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.menu-btn {
+  width: 24px;
+  height: 24px;
+  -webkit-mask-image: url('../../assets/menu-24px.svg');
+  mask-image: url('../..//assets/menu-24px.svg');
+  background-color: white;
+}
+</style>

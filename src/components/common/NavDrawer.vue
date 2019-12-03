@@ -11,8 +11,7 @@
         <v-list-tile-content>
           <v-list-tile-title>{{ this.getCorpName }} 님 환영합니다!</v-list-tile-title>
         </v-list-tile-content>
-        <v-divider></v-divider>
-        <v-icon @click="onClickDrawer">close</v-icon>
+        <i class="close-btn" @click="onClickDrawer"/>
       </v-list-tile>
     </v-list>
 
@@ -23,7 +22,7 @@
         :key="item.title"
       >
         <v-list-tile-action>
-          <v-icon>{{ item.icon }}</v-icon>
+          <img :src="item.icon">
         </v-list-tile-action>
         <v-list-tile-content>
           <v-list-tile-title @click="onClickMenu(item)">{{ item.title }}</v-list-tile-title>
@@ -49,10 +48,19 @@ export default {
           name: item.link
         })
       } else {
-        console.log(item.link)
         window.location.href = item.link
       }
     }
   }
 }
 </script>
+
+<style scoped>
+.close-btn {
+  width: 24px;
+  height: 24px;
+  -webkit-mask-image: url('../../assets/close-24px.svg');
+  mask-image: url('../..//assets/close-24px.svg');
+  background-color: grey;
+}
+</style>
